@@ -1,0 +1,1467 @@
+% +--------------------------------------------------+
+% | Typeset this file to document enumitem.sty       |
+% +--------------------------------------------------+
+%
+% Copyright (c) 2003-2011 by Javier Bezos.
+% All Rights Reserved.
+%
+% This file is part of the enumitem distribution release 3.5.2
+% ------------------------------------------------------------
+% 
+% It may be distributed and/or modified under the
+% conditions of the LaTeX Project Public License, either version 1.3
+% of this license or (at your option) any later version.
+% The latest version of this license is in
+%   http://www.latex-project.org/lppl.txt
+% and version 1.3 or later is part of all distributions of LaTeX
+% version 2003/12/01 or later.
+% 
+% This work has the LPPL maintenance status "maintained".
+% 
+% The Current Maintainer of this work is Javier Bezos.
+
+\documentclass[a4paper]{ltxguide}
+
+\makeatletter
+\newenvironment{desc}
+  {\if@nobreak
+     \vskip-\lastskip
+     \vspace*{-2.5ex}%
+   \fi
+   \decl}
+  {\enddecl}
+\makeatother
+
+\newcommand\3{\unskip\enspace\fbox{\fontsize{4}{4}\selectfont NEW 3.0}}
+
+\usepackage{hyperref}
+
+%\usepackage{pslatex}
+
+\title{Customizing lists\\with the\\\textsf{enumitem} package}
+
+\author{Javier Bezos\footnote{For bug reports, comments and
+suggestions go to \href{http://www.tex-tipografia.com/enumitem.html}%
+{\texttt{http://www.tex-tipografia.com/enumitem.html}}.
+English is not my strong point, so contact me when you
+find mistakes in the manual. Other packages by the same author:
+\textsf{gloss} (with Jos\'e Luis D\'{\i}az), \textsf{accents,
+tensind, esindex, dotlessi, titlesec, titletoc}.}}
+
+\date{Version 3.5.2\\2011-09-28}
+
+\IfFileExists{enumitem.sty}{\usepackage{enumitem}}{}
+
+\addtolength{\topmargin}{-3pc}
+\addtolength{\textwidth}{6pc}
+\addtolength{\oddsidemargin}{-2pc}
+\addtolength{\textheight}{7pc}
+
+\raggedright
+\parindent1.8em
+\parskip0pt
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+When I began to use \LaTeX{} several year ago, two particular points
+annoyed me because I found customizing them was very complicated
+---headlines/footlines and lists.  A new way to redefine the former is
+accomplished in my own \textsf{titlesec} package, but none was
+available to customize the latter except:
+\begin{itemize}
+\item \textsf{enumerate}, which just allows to change the label and
+it does it pretty well.
+
+\item \textsf{mdwlist}, which only ``provides some vaguely useful
+list-related commands and environments,'' as its manual states,
+and not a coherent way of handling lists.
+
+\item \textsf{paralist}, which provides lists within a paragraph (the
+original purpose of this package), a few other hard-wired
+specific changes and the optional argument of \textsf{enumerate}.
+\end{itemize}
+
+One of the main drawbacks of the standard |list| is its weird
+parameters, whose meaning is not always obvious.  In order to provide
+a cleaner interface two approaches were possible: either defining new
+lists, or introducing a new syntax making the standard lists easier to
+customize.  For marks I took the first approach in titlesec, just
+because I did not manage to find a satisfactory solution with the
+\LaTeX{} internal macros, but since lists are in some sense more
+``complete'' than sections and marks, I have taken here the second
+approach.
+
+In the interface a sort of ``inheritance'' is used. You can
+set globally the behaviour of lists and then override several
+parameters of, say, enumerate and then in turn override
+a few paremeters of a particular instance. The values will
+be searched in the hierarchy.
+
+\section{The package}
+
+This package is intended to ease customizing the three
+basic list environments: |enumerate|, |itemize| and
+|description|. It extends their syntax to allow
+an optional argument where a set of parameters in the
+form |key=value| are available:
+\begin{itemize}
+\item
+Vertical spacing:
+\begin{itemize}
+\item |topsep|
+\item |partopsep|
+\item |parsep|
+\item |itemsep|
+\end{itemize}
+\item
+Horizontal spacing:
+\begin{itemize}
+\item |leftmargin|
+\item |rightmargin|
+\item |listparindent|
+\item |labelwidth|
+\item |labelsep|
+\item |itemindent|
+\end{itemize}
+\end{itemize}
+
+For example:
+\begin{verbatim}
+\begin{itemize}[itemsep=1ex,leftmargin=1cm]
+\end{verbatim}
+
+The keys above are equivalent to the well known list parameters---see a
+\LaTeX{} manual for a description of them.  Next sections explains the
+extensions provided by |enumitem|.
+
+\section{Keys}
+
+This section describes the keys in displayed lists. Most of them are 
+available in inline lists, where further keys are available (see 
+\ref{s.inline}).
+
+\subsection{Label and cross references format}
+
+\begin{desc}
+|label=<commands>|
+\end{desc}
+
+Sets the label to be used in the current level.
+A set of starred versions of |\alph|, |\Alph|,
+|\arabic|, |\roman| and |\Roman|, without argument
+stand for the current counter in |enumerate|.\footnote{Actually,
+the asterisk is currently the argument but things may change.
+Consider them as starred variants and follow the corresponding
+syntax.} Thus
+\begin{verbatim}
+\begin{enumerate}[label=\emph{\alph*})]
+\end{verbatim}
+prints \textit{a}), \textit{b}), and so on (this is a
+standard style in Spanish, and formerly used by Chicago, too).
+
+It works with |\value|, too (provided the widest label is not to be
+computed or \verb|widest*| is used, see below).  A fancier example
+(which looks ugly, but it is intended only to illustrate what is
+possible; requires \textsf{color} and \textsf{pifont}):
+\begin{verbatim}
+\begin{enumerate}[label=\protect\fcolorbox{blue}{yellow}{\protect\ding{\value*}},
+                  start=172]
+\end{verbatim}
+
+The value of |label| is a moving argument, and fragile commands must
+be protected \textit{except} the counters.  Because of that, use of
+\verb|\value| is somewhat tricky, because \verb|\the| or \verb|\ifnum|
+expects an actual value, which is not the case when \verb|label| is
+being processed to replace internally the \verb|*| by the form with
+the counter argument.  The best solution is usually encapsulating the
+logic inside a new ``counter'' with the help of
+\verb|\AddEnumerateCounter|.\footnote{Which is admittedly somewhat
+convoluted.  A better way to accomplish this is on the way.}
+
+If you prefer setting labels like the \textsf{enumerate} package, use 
+``short labels'' (see section \ref{s.short}).
+
+\begin{desc}
+|label*=<commands>|
+\end{desc}
+
+Like |label| but its value is appended to the parent label.  For example, the follollowing defines a |legal| list (1.,
+1.1., 1.1.1., and so on):
+\begin{verbatim}
+\newlist{legal}{enumerate}{10}
+\setlist[legal]{label*=\arabic*.}
+\end{verbatim}
+
+\begin{desc}
+|ref=<commands>|
+\end{desc}
+
+By default, |label| sets also the form of cross references and
+|\the...| (overriding the settings in previous hierarchical
+levels), but you can define a different format with this key.  For
+example, to remove the right parethesis:
+\begin{verbatim}
+\begin{enumerate}[label=\emph{\alph*}),ref=\emph{\alph*}]
+\end{verbatim}
+In both |label| and |ref|, the counters can be
+used as usual:
+\begin{verbatim}
+\begin{enumerate}[label=\theenumi.\arabic*.]
+\end{verbatim}
+or
+\begin{verbatim}
+\begin{enumerate}[label=\arabic{enumi}.\arabic*.]
+\end{verbatim}
+(provided the current level is the second one).
+
+Note the |label|s are \textit{not} accumulated to form
+the reference. If you want, say, something like 1.\textit{a}
+from 1) as first level and \textit{a}) as second level,
+you must set it with |ref|. You may use
+|\ref{level1}.\ref{level2}| with appropiate |ref|
+settings, but as Robin Fairbairns points out in the \TeX{} FAQ
+\begin{quote}
+\dots{} [that] would be both tedious and error-prone. What is more, it 
+would be undesirable, since you would be constructing a visual 
+representation which is inflexible (you could not change all the 
+references to elements of a list at one fell swoop).
+\end{quote}
+This is sensible and I recommend to follow the advice, but sometimes
+you might want something like:
+\begin{verbatim}
+... subitem \ref{level2} of item \ref{level1} ...
+\end{verbatim}
+
+The value of |ref| is a moving argument, and fragile
+commands must be protected \textit{except} the counters.
+
+\begin{desc}
+|font=<commands>|\qquad\verb|format=<commands>|
+\end{desc}
+
+Sets the label font.  Useful when the label is changed with the
+optional argument of |\item| and in \texttt{description}.  The last
+command in |<commands>| can take an argument with the item label.  In
+\texttt{description} class setting are in force, so you may want begin
+with \verb|\normalfont|. A synonymous is \texttt{format}.
+
+\begin{desc}
+|align=left|\qquad |align=right|\qquad |align=parleft|\3
+\end{desc}
+
+How the label is aligned (with relation to the label box edges).
+Three values are possible: |left|, the default |right| and
+\verb|parleft| (a parbox of width \verb|\labelwidth| with flush left
+text).  The parameters controlling the label spacing should be
+properly set, either by hand or more conveniently with the |*|
+settings (see below):
+\begin{verbatim}
+\begin{enumerate}[label=\Roman*., align=left, leftmargin=*]
+\end{verbatim}
+(When the label box is supposed to have its natural width, use
+|left|.) 
+
+\begin{desc}
+|\SetLabelAlign{<value>}{<commands>}|\3
+\end{desc}
+
+New align types can be defined (or the existing ones redefined) with
+|\SetLabelAlign|; the predefined values are equivalent
+to:\footnote{Prior to version 3.0 the left alignments was incorrectly
+defined and the label and the text could overlap.}
+\begin{verbatim}
+\SetLabelAlign{right}{\hss\llap{#1}}
+\SetLabelAlign{left}{#1\hfil}
+\SetLabelAlign{parleft}{\strut\smash{\parbox[t]\labelwidth{\raggedright##1}}}
+\end{verbatim}
+
+If the last thing in the definition is a skip (typically \verb|\hfil|), it is
+removed sometimes by description. If for some reason you want to avoid
+this, just add \verb|\null| at the end.
+
+Although primarily intended for the alignment, this commands has other
+uses (as in the provided \verb|parleft|).  For example, with the
+following all labels with |align=right| are set as superscripts:
+\begin{verbatim}
+\SetLabelAlign{right}{\hss\llap{\textsuperscript{#1}}}
+\end{verbatim}
+(A new name is also possible, of course.)
+
+If you want the internal settings for \texttt{align} and \texttt{font}
+be ignored, you can override the \textsf{enumitem} definition of
+\verb|\makelabel| in \texttt{before}:
+\begin{verbatim}
+\begin{description}[before={\renewcommand\makelabel[1]{\ref{##1}}}]
+\end{verbatim}
+(Alternatively, define a macro and use \verb|\let|.) 
+
+\subsection{Horizontal spacing of labels}
+
+\begin{desc}
+|labelindent=<length>|\\
+\verb|\labelindent|
+\end{desc}
+
+This  parameter is added in \textsf{enumitem} for the blank space from
+the margin of the enclosing list/text to the left edge of the label box.  This
+means there is a redundancy because one of the parameters depends on
+the others, i.e., it has to be computed from the other values, as
+described below.  There is a new counter length |\labelindent| which
+defaults to 0 pt. The five parameteres are related in the following 
+way:
+\[
+\verb|\leftmargin|+\verb|\itemindent| = 
+\verb|\labelindent|+\verb|\labelwidth|+\verb|\labelsep|
+\]
+
+\begin{desc}
+|leftmargin=!|\qquad|itemindent=!|\qquad|labelsep=!|
+\qquad|labelwidth=!|\qquad|labelindent=!|\3
+\end{desc}
+
+Sets which value is to be computed from the others. This is done 
+after \textit{all} keys has been read. Explicit values are not lost, and
+so with the following hierarchical settings:
+\begin{verbatim}
+leftmargin=2em
+labelindent=1em,leftmargin=!
+labelindent=!
+\end{verbatim}
+|leftmargin| is again 2em and |labelindent| is the computed parameter.
+The default is |labelindent=!|, but note some keys sets another value 
+(\verb|wide| and description \verb|style|s).
+
+With |align=right| (the default), |labelindent=!| and
+|labelwidth=!| behave similarly in practice. 
+
+\begin{desc}
+|leftmargin=*|\qquad|itemindent=*|\qquad|labelsep=*|
+\qquad|labelwidth=*|\qquad|labelindent=*|
+\end{desc}
+
+Like before, but |labelwidth| is set to the width of the current
+label, using the default value of \textit{0} in |\arabic*|,
+\textit{viii} in |\roman*|, \textit{m} in |\alph*| and
+similarly in uppercase forms (these values can be changed with
+|widest|, see below).  Examples are:
+\begin{verbatim}
+\begin{itemize}[label=\textbullet, leftmargin=*]
+\begin{enumerate}[label=\roman*), leftmargin=*, widest=iii]
+\begin{itemize}[label=\textbullet,
+                leftmargin=2pc, labelsep=*]
+\begin{enumerate}[label=\arabic*., leftmargin=2\parindent, 
+                  labelindent=\parindent, labelsep=*]
+\end{verbatim}
+
+The most useful are |labelsep=*| and |leftmargin=*|.
+With the former the item body begins at a fixed place (namely,
+|leftmargin|), while with the latter begins at a variable place
+depending on the label (but always the same within a list, of course).
+Most of times, what you would want is |leftmargin=*|.
+
+Unfortunately, \LaTeX{} does not define a default |labelsep| to
+be applied to all lists---simply the current value is used.  With
+\textsf{enumitem} you can set default values for every list, as
+described below, and so, if you want to make sure |labelsep| is
+under your control, all you need is something like:
+\begin{verbatim}
+\setlist{itemsep=.5em}
+\end{verbatim}
+
+|labelwidth=*| and |labelwidth=!| are synonymous.
+
+\begin{desc}
+|widest=<string>|\qquad|widest*=<integer>|\3\qquad|widest|
+\end{desc}
+
+To be used in conjunction with the \texttt{*}-values, if
+desired.  It overrides the default value for the widest
+printed counter.  Sometimes, if lists are not very long, a value of
+|a| for |\alph| is more sensible than the default |m|:
+\begin{verbatim}
+\begin{enumerate}[leftmargin=*,widest=a] % Assume standard 2nd level
+\end{verbatim}
+With no value, the default is restored. With |widest*|, the string is 
+built using |<integer>| as the value of the counter (e.g., with 
+\verb|\roman|, 
+\verb|widest=viii| and \verb|widest*=8| are the same).
+
+Since |\value| does not return a string but a number, 
+|widest| and the \verb|*| values cannot be used with it. 
+However, with \verb|widest*|, being a number, it is allowed.
+
+\subsection{More on horizontal spacing}
+
+Since |\parindent| is not used as such inside lists, but instead
+is set internally to either |\itemindent| or |\listparindent|,
+when used as the value of a parameter \textsf{enumitem} returns the
+global value, i.  e., the value it has outside the outermost list.
+
+The horizontal space in the left margin of the current level is
+distributed in the following way:\footnote{Admittedly, these figures
+are not exactly the clearest possible, and I intend to improve them in
+a future release}
+\begin{center}
+\begin{tabular}{cc}
+\fbox{\fbox{\strut \texttt{labelindent}}
+  \fbox{\strut \texttt{labelwidth}}
+  \fbox{\strut \texttt{labelsep} $-$ \texttt{itemintent}}}
+&
+\fbox{\strut\texttt{itemindent}}\\
+\texttt{leftmargin}
+\end{tabular}
+\end{center}
+
+\begin{desc}
+\verb|labelsep*=<length>|\3
+\end{desc}
+
+Remember |labelsep| spans part of |leftmargin| and
+|itemindent| if the latter is not zero.  This is often somewhat
+confusing, so a new key is provided---with \texttt{labelsep*} the
+value is reckoned from the left margin (it just sets |\labelsep| 
+and then adds |\itemindent| to it, but in addition later changes to
+|itemindent| are taken into account):
+\begin{center}
+\begin{tabular}{cc}
+\fbox{\fbox{\strut \texttt{labelindent}}
+  \fbox{\strut \texttt{labelwidth}}
+  \fbox{\strut \texttt{labelsep*}}}
+&
+\fbox{\strut\texttt{itemindent}}\\
+\texttt{leftmargin}
+\end{tabular}
+\end{center}
+
+\begin{desc}
+|labelindent*=<length>|\3
+\end{desc}
+
+Like |labelindent|, but it is reckoned from the left margin in 
+the current list and not from that in the enclosing list/text.
+
+\subsection{Numbering, stopping, and resuming}
+
+\begin{desc}
+|start=<integer>|
+\end{desc}
+Sets the number of the first item.
+
+\begin{desc}
+|resume|
+\end{desc}
+
+The counter continues from the previous |enumerate|,
+instead of being reset to 1.
+\begin{verbatim}
+\begin{enumerate}
+\item First item.
+\item Second item.
+\end{enumerate}
+Text.
+\begin{enumerate}[resume]
+\item Third item 
+\end{enumerate}
+\end{verbatim}
+
+This is done locally. If you want global resuming, see next section on series.
+
+\begin{desc}
+|resume*|
+\end{desc}
+
+Like |resume| but the options from the previous list are used,
+too.  This option must be restricted to the optional argument in a
+environment (this is the only place where it makes sense).  It should
+be used sparingly---if you are using it often, then very likely you
+want to define a new list (see \ref{s.clone}).  Further keys are allowed, and
+in this case the saved options are overriden by those in the current
+list (i.e., the position of \texttt{resume*} does not matters).  For
+example:
+\begin{verbatim}
+\begin{enumerate}[resume*,start=1] % or [start=1,resume*]
+\end{verbatim}
+uses the keys in the previuos \texttt{enumerate}, but restarts the
+counter.  If there is a series of a certain list with
+\texttt{resume*}, options are taken from the list previous to the
+first one, except for \texttt{start}.
+
+\subsection{Series}
+
+\begin{desc}
+|series=<series-name>|\3\\
+|<series-name>|\qquad|resume*=<series-name>|
+\qquad|resume=<series-name>|\3
+\end{desc}
+
+A new method (3.0) of continuing lists is by means of the key
+\texttt{series}, so that they behave like a unit.  A list with key
+\texttt{series} is considered the starting list and its settings are
+stored \textit{globally}, so that they can be used later with
+\texttt{resume}/\texttt{resume*}.  All these keys take a value with
+the series name (which must be different from existing keys):
+\begin{itemize}
+\item |resume=<series-name>| just continue numbering items in the
+series,
+\item |resume*=<series>| also applies the settings of the 
+starting list,
+\item |<series>|, i.e., the series name used as a key, is an 
+alternative to |resume*=<series>|.
+\end{itemize}
+For example:
+\begin{verbatim}
+\begin{enumerate}[label=\arabic*(a),leftmargin=1cm,series=lafter]
+\item A
+\item B
+\end{enumerate}
+\end{verbatim}
+You get: 1(a)  2(a). You can continue with:
+\begin{verbatim}
+\begin{enumerate}[label=\arabic*(b),resume*=lafter]
+                 % or [label=\arabic*(b),lafter]
+\item A
+\item B
+\end{enumerate}
+\end{verbatim}
+You get: 3(b)  4(b). (But you can use |start=1|, if you like.)
+
+Note you can add further arguments, which are executed after those
+saved at the starting list and therefore take precedence over them --
+in particular, |resume*| itself takes precedence over a
+|start| (e.g., |start=1|) in the the starting list.
+
+Every time a series is started, several commands are defined 
+internally, so to avoid wasting resources and use the same name for 
+non-overlapping series.
+
+
+\subsection{Penalties}
+
+\begin{desc}
+|beginpenalty=<integer>|\qquad
+|midpenalty=<integer>|\qquad |endpenalty=<integer>|
+\end{desc}
+
+Set the penalty at the beginning of a list, between items and at the
+end of the list, respectively.  Please, refer to your \LaTeX{} or
+\TeX{} manual about how penalties control page breaks.  Unlike other
+parameters, when a list starts their values are not reset to the
+default, thus they apply to the child lists.
+\begin{desc}
+|before=<code>| \qquad |before*=<code>|
+\end{desc}
+
+Execute code before the list starts (more precisely, in the second
+argument of the |list| environment used to define them).  The
+unstarred form sets the code to be executed, overriding any previous
+value, while the starred one adds the code to the existing one (in
+the setting hierarchy, see below, \textit{not} with relation to the
+enclosing list/text).  It can contain, say, rules and text, but this
+has not been extensively tested.  All calculations have been finished,
+and you can access and manipulate the list parameters.  For example,
+to have both margins (left and right) set to the widest label:
+\begin{verbatim}
+\setlist{leftmargin=*,before=\setlength{\rightmargin}{\leftmargin}}
+\end{verbatim}
+
+\begin{desc}
+|after=<code>|\qquad|after*=<code>|
+\end{desc}
+
+Same, but just before the list ends.
+
+\subsection{Description styles}
+
+A key available in |description|.
+\begin{desc}
+|style=<name>|
+\end{desc}
+
+Sets the description \textit{style}. |<name>| can be any of the 
+following:
+\begin{itemize}
+
+\item |standard|: like |description| in standard classes, although
+with other classes it could be somewhat different.  The label is
+boxed.  Sets \verb|itemindent=!|.
+
+\item |unboxed|: much like the standard |description|, but 
+the label is not boxed to avoid uneven spacing and unbroken labels if 
+they are long. Sets \verb|itemindent=!|.
+
+\item |nextline|: if the label does not fit in the margin, the text
+continues in the next line, otherwise it is placed in a box of width
+|\leftmargin| $-$ |\labelsep|, i.e., the item body never sticks into
+the left margin.  Sets \verb|labelwidth=!|.
+
+\item |sameline|: like |nextline| but if the label does not 
+fit in the margin the text continues in the same line. Same as
+\verb|style=unboxed,labelwidth=!|.
+
+\item |multiline|: the label is placed in a parbox whose width is 
+|leftmargin|, with several lines if 
+necessary. Same as \verb|style=standard,align=parleft,labelwidth=!|.
+
+Three caveats: (1) mixing boxed and unboxed labels has not a
+well-defined behaviour, (2) when nesting list all combinations are
+allowed but not all make sense, and (3) nesting \verb|nextline| lists
+is not supported (it works, but its behaviour might change in the
+future, because the current one is not what one could expect).
+
+
+
+\end{itemize}
+
+
+\subsection{Compact lists}
+
+\begin{desc}
+|noitemsep|\qquad|nosep|
+\end{desc}
+
+The key |noitemsep| kills the space between items and paragraphs
+(i.e., |itemsep=0pt| and |parsep=0pt|), while
+|nosep| kills all vertical spacing.\footnote{The key 
+\texttt{nolistsep}, now deprecated, introduced a thin stretch, which 
+was not the intended behaviour.}
+
+\subsection{``Wide'' lists}
+
+\begin{desc}
+\verb|wide|\3\\
+\verb|wide=<parindent>|
+\end{desc}
+
+With this convenience key, the leftmargin is null and the label is
+part of the text---in other word, the items look like ordinary
+paragraphs.\footnote{\texttt{fullwidth} is deprecated.} Here |labelsep|
+sets the separation between the label and the first word.  It is
+equivalent to
+\begin{verbatim}
+align=left, leftmargin=0pt, labelindent=\parindent,
+listparindent=\parindent, labelwidth=0pt, itemindent=!
+\end{verbatim}
+With |wide=<parindent>| you may set at once another value instead of
+|\parindent|.  Of course, these keys can be overriden after
+\verb|wide|, too; for example, remembering that with left-aligned labels
+the text is pushed if the they are wider than |labelwidth|, you
+can set |labelwidth=1.5em| for a minimal width, or instead of
+|itemindent=!| you may prefer |itemindent=*|, which sets the
+minimal width to that of widest label.  In level 2 you may prefer
+|labelindent=2\parindent|, and so on.  You may also want to
+combine it with |noitemsep| or |nolistsep|.
+
+\section{Inline lists}
+\label{s.inline}
+
+\3
+
+Inline lists are ``horizontal'' lists set as ordinary text inside a
+paragraph.  With this package you can create inline lists, as
+explained below, with \verb|\newlist|, which have their own labels and
+counters.  However, in most cases inline versions of standard lists,
+with the same labelling schema, will be enough -- the package option
+\verb|inline| does that.
+
+
+\begin{desc}
+|inline| \qquad(package option)\\
+\texttt{enumerate*}\qquad\texttt{itemize*}\qquad
+\texttt{description*} \qquad(environments)
+\end{desc}
+
+With the package option \texttt{inline}, three environments for inline
+lists are defined: \texttt{enumerate*}, \texttt{itemize*}, and
+\texttt{description*}.  They emulate the behaviour of
+\textsf{paralist} and \textsf{shortlst} in that labels and settings
+are shared with the displayed (ie, ``normal'') lists \texttt{enumerate},
+\texttt{itemize} and \texttt{description}, respectively (however,
+remember resuming is based on environment names, not on list types).  This applies
+only to those created with \texttt{inline} -- inline lists created
+with |\newlist| as described below are independent and use their
+own labels and settings. Note as well \verb|inline| is not required 
+if you needn't inline versions of standard lists.
+
+\begin{desc}
+|itemjoin=<string>|\qquad|itemjoin*=<string>|
+\qquad|afterlabel=<string>|
+\end{desc}
+
+Format is set with keys \texttt{itemjoin} (default is a space), and
+\texttt{afterlabel} (default is |\nobreakspace|, ie, |~|).
+An additional key is \texttt{itemjoin*}, which, if set, is used
+instead of \texttt{itemjoin} before the last item.  So, with
+\begin{verbatim}
+before=\unskip{: }, itemjoin={{; }}, itemjoin*={{, and }}
+\end{verbatim}
+the following punctuation between items is used:
+\begin{quote}
+Blah blah: (a) one; (b) two; (c) three, and (d) four. Blah blah
+\end{quote}
+
+\verb|itemjoin| is ignored in vertical mode (i.e., in mode unboxed
+and just after a quote, a displayed list and the like).
+
+\begin{desc}
+|mode=unboxed|\qquad|mode=boxed|
+\end{desc}
+
+Items are boxed, so floats are lost and nested lists are not allowed
+(remember many displayed elements are defined as lists).  If using
+floats or lists inside inline lists is important, use an alternative
+``mode'', which you can activate with
+\texttt{mode=unboxed} (the default is \texttt{mode=boxes}).  With it
+floats may be used freely, but misplaced |\item|s are not catched and
+\texttt{itemjoin*} is ignored (a warning is written to the log about
+this fact).
+
+\section{Global settings}
+
+Global changes, to be applied to all of these list, are also
+possible:
+\begin{desc}
+|\setlist[enumerate,<levels>]{<format>}|\\
+|\setlist[itemize,<levels>]{<format>}|\\
+|\setlist[description,<levels>]{<format>}|\\
+|\setlist[<levels>]{<format>}|
+\end{desc}
+Where |<level>| is the list level (one or more) in |list|, and the
+corresponding levels in |enumerate| and 
+|itemize|.\footnote{\verb|\string\setenumerate|, 
+\verb|\string\setitemize| and \verb|\string\setdescription| are 
+deprecated.}  With no
+|<levels>|, the format applies to all of them.  Here list does not
+mean any list but only the three ones handled by this package and
+those redefined by this package or defined with |\newlist| (see
+below).  For example:
+\begin{verbatim}
+\setlist{noitemsep}
+\setlist[1]{\labelindent=\parindent} % << Usually a good idea
+\setlist[itemize]{leftmargin=*}
+\setlist[itemize,1]{label=$\triangleleft$}
+\setlist[enumerate]{labelsep=*, leftmargin=1.5pc}
+\setlist[enumerate,1]{label=\arabic*., ref=\arabic*}
+\setlist[enumerate,2]{label=\emph{\alph*}),
+                      ref=\theenumi.\emph{\alph*}}
+\setlist[enumerate,3]{label=\roman*), ref=\theenumii.\roman*}
+\setlist[description]{font=\sffamily\bfseries}
+\end{verbatim}
+These setting are read in the following order: list, list at the
+current level, enumerate/itemize/description, and
+enumerate/itemize/description at the current level; if a key appears
+several times with different values, the last one, i.e.,  the most
+specific one, is applied.  If we are resuming a series or a list with
+\texttt{resume*}, the saved keys are then applied.  Finally, the
+optional argument (except \texttt{resume*}), if any, is applied.
+
+\LaTeX{} provides a set of macros to change many of these parameters,
+but setting them with the package is more consistent and sometimes
+more flexible at the cost of being more ``explicit'' (and verbose).
+
+The list specification can contain variables and counters, provided
+they are expandable, and counters are \textsf{calc}-savvy, so that if
+you load this package you can write things like:
+\begin{verbatim}
+\newcount{toplist}
+\setcount{toplist}{1}
+\newcommand{\mylistname}{enumerate}
+\setlist[\mylistname,\value{toplist}+1]{labelsep=\itemindent+2em]
+\end{verbatim}
+This allows defining lists within loops.
+
+Currently, a way to discriminate the font size is not provided
+(|\normalsize|, |\small|\dots).
+
+\section{\textsf{enumerate}-like labels}
+\label{s.short}
+
+\begin{desc}
+|shortlabels| (package option)
+\end{desc}
+
+With the package option \texttt{shortlabels} you can use an
+\textsf{enumerate}-like syntax, where |A|, |a|, |I|,
+|i| and |1| stand for |\Alph*|, |\alph*|,
+|\Roman*|, |\roman*| and |\arabic*|.  This is intended
+mainly as a sort of compatibility mode with the \textsf{enumerate}
+package, and therefore the following special rule applies: if the very
+first option (at any level) is not recognized as a valid key, then it
+will be considered a label with the \textsf{enumerate}-like syntax.  For
+example:
+\begin{verbatim}
+\begin{enumerate}[i), labelindent=\parindent]
+...
+\end{enumerate}
+\end{verbatim}
+Although perhaps not so useful, you can omit |label=| in the
+itemize environment under similar conditions, too:
+\begin{verbatim}
+\begin{itemize}[\textbullet]
+...
+\end{itemize}
+\end{verbatim}
+
+\begin{desc}
+|\SetEnumerateShortLabel{<key>}{<replacement>}|
+\end{desc}
+
+With this command, you can define new keys (or redefine them), which is
+particularly useful for enumerate to be adapted to especific
+typographical rules or to extend it for non-Latin scrips. Here
+|<replacement>| contains one of the starred versions of 
+counters. For example:
+\begin{verbatim}
+\SetEnumerateShortLabel{i}{\textsc{\roman*}}
+\end{verbatim}
+redefines |i| so that items using this key are numbered with
+small caps roman numerals. The key has to be a single letter.
+
+\section{Cloning the basic lists}
+\label{s.clone}
+
+\begin{desc}
+|\newlist{<name>}{<type>}{<max-depth>}|\\
+|\renewlist{<name>}{<type>}{<max-depth>}|
+\end{desc}
+
+The three lists can be cloned so that you can define ``logical''
+environments behaving like them.  To define a new lists (or redefine a
+existing one), use |\newlist| (or |\renewlist|), where |<type>| is
+|enumerate|, |itemize| or |description|.
+
+If <type> is |enumerate|, a set of counters with names |<name>i|,
+|<name>ii|, |<name>iii|, |<name>iv|, etc.  (depending on <max-depth>)
+is defined.  Don't use an arbitrarily large number for <max-depth>, to
+avoid creating too many counters.  Then you can use those counters in
+labels; e.  g., if you have defined a list named \texttt{steps}, you
+can define a label with:
+\begin{verbatim}
+label=\arabic{stepsii}.\arabic{stepsi}
+\end{verbatim}
+
+\begin{desc}
+\verb|\setlist[<names>,<levels>]{<keys/values>}|\\
+\verb|\setlist*[<names>,<levels>]{<keys/values>}|
+\end{desc}
+
+After creating a list, you can (in fact you
+must, at least the label) set the new list with |\setlist|:
+\begin{verbatim}
+\newlist{ingredients}{itemize}{1}
+\setlist[ingredients]{label=\textbullet}
+\newlist{steps}{enumerate}{2}
+\setlist[steps,1,2]{label=(\arabic*)}
+\end{verbatim}
+Names in the optional argument of |\setlist| say which lists applies the
+settings to, and numbers say the level (it is calc-savvy).  Several
+lists and/or several levels can be given, and all combinations are
+set; e.g.:
+\begin{verbatim}
+\setlist[enumerate,itemize,2,3]{...}
+\end{verbatim}
+\noindent sets enumerate/2, enumerate/3, itemize/2 and itemize/3. 
+No number (or 0) means ``all levels'' and no name means ``all lists''; no 
+optional argument means ``all lists at all levels''.
+
+The three inline lists have types \texttt{enumerate*},
+\texttt{itemize*}, and \texttt{description*}, which are available
+always, even without the package option |inline| (which just defines
+three environments with these names).
+
+The starred form \verb|\setlist*| adds the settings to previous ones.
+
+\begin{desc}
+\verb|\setlistdepth{<integer>|\3
+\end{desc}
+
+By default, \LaTeX{} has a limit of 5 nesting levels, but when 
+cloning list this value may be too short, and therefore you may want 
+to set a new value. In levels below the 5th (or the deepest defined by a 
+class), the settings of the last are used (i.e., \verb|\@listvi|).
+
+\section{More about counters}
+
+\subsection{New counter representation}
+
+\begin{desc}
+\verb|\AddEnumerateCounter{<LaTeX command>}{<internal command>}{<widest label>}|
+\end{desc}
+
+``Registers'' a counter representation so that \textsf{enumitem}
+recognizes it.  Intended mainly for non Latin scripts, but also useful
+in Latin scripts.  For example:
+\begin{verbatim}
+\makeatletter
+\def\ctext#1{\expandafter\@ctext\csname c@#1\endcsname}
+\def\@ctext#1{\ifcase#1\or First\or Second\or Third\or
+Fourth\or Fifth\or Sixth\fi}
+\makeatother
+\AddEnumerateCounter{\ctext}{\@ctext}{Second}
+\end{verbatim}
+A starred variant allows to give a number instead of a string as the 
+widest label; for example, if the widest label is that corresponding 
+to the value 2:\3
+\begin{verbatim}
+\AddEnumerateCounter*{\ctext}{\@ctmoreext}{2}
+\end{verbatim}
+This variant is to be preferred if the representation is not a plain 
+string but it is styled, e.g.,
+with small caps. (The counter names can contain |@| even if not a letter.) 
+
+\subsection{Restarting \texttt{enumerate}s}
+
+\begin{desc}
+|\restartlist{<list-name>}|\3
+\end{desc}
+
+Currently, with
+\begin{verbatim}
+\setlist[enumerate]{resume}
+\end{verbatim}
+you can get a continuous numbering through a document.  A new command has
+been added for restarting the counter in the middle of the document:
+\begin{verbatim}
+\restartlist{<list-name>}
+\end{verbatim}
+
+It is based solely in the list name, not the list type, which means
+\texttt{enumerate*} as defined with the package option \texttt{inline}
+is not the same as \texttt{enumerate}, because its name is different.
+
+\section{Generic keys and values}
+
+\begin{desc}
+|\SetEnumitemKey{<key>}{<replacement>}|\3
+\end{desc}
+
+With this command you can create your own (valueless) keys.  For
+example:
+\begin{verbatim}
+\SetEnumitemKey{midsep}{topsep=3pt,partopsep=0pt}
+\end{verbatim}
+
+Keys so defined can then be used like the others. Another example is
+multicolumn lists, with \textsf{multicol}:
+\begin{verbatim}
+\SetEnumitemKey{twocol}{
+  itemsep=1\itemsep,
+  parsep=1\parsep,
+  before=\raggedcolumns\begin{multicols}{2},
+  after=\end{multicols}}
+\end{verbatim}
+
+(The settings for \texttt{itemsep} and \texttt{parsep} kill the
+stretch and shrink parts.  Of course, you may want to define a
+new list.)
+
+Note the package may introduce new keys in the future, so
+\verb|\SetEnumitemKey| is a potential source of forward
+incompatibilities.  However, it's safe using a non-letter character
+other than hyphen or star in the key name (e.g., \verb|:name| or 
+\verb|2_col|).
+
+\begin{desc}
+|\SetEnumitemValue{<key>}{<string-value>}{<replacement>}|\3
+\end{desc}
+
+This commands provides a further abstraction layer for the
+|<key>=<value>| pairs.  With it you can define logical names which
+are translated to the actual value.  For example, with:
+\begin{verbatim}
+\SetEnumitemValue{label}{numeric}{\arabic*.}
+\SetEnumitemValue{leftmargin}{standard}{\parindent}
+\end{verbatim}
+you might say:
+\begin{verbatim}
+\begin{enumerate}[label=numeric,leftmargin=standard]
+\end{verbatim}
+So, you can left to the final design what |label=numeric| means.
+
+\section{Package options}
+
+Besides \verb|inline|, \verb|ignoredisplayed|, and \verb|shortlabels|,
+the following option is available.
+
+\begin{desc}
+\verb|loadonly|
+\end{desc}
+
+With this package option the package is loaded but the three
+lists are not redefined. You can create your own lists, yet, or
+even redefine the existing ones.
+
+\section{Three patterns}
+
+Three list layouts could be considered very
+frequent. Let us apply the parameters above to define them. (Below 
+are samples.)
+
+The first pattern aligns the label with the surrounding
+|\parindent| while the item body is indented depending
+on the label and a fixed |labelsep|:
+\begin{verbatim}
+labelindent=\parindent,
+leftmargin=*
+\end{verbatim}
+A fairly frequent variant is aligning the label with the
+surrounding text (rememeber |labelindent| is |0pt| by
+default):
+\begin{verbatim}
+leftmargin=*
+\end{verbatim}
+The former looks better in the first level while the latter
+seems preferable in subsequent ones. That can be easily
+set with
+\begin{verbatim}
+\setlist{leftmargin=*}
+\setlist[1]{labelindent=\parindent} % Only the level 1
+\end{verbatim}
+
+The second pattern aligns the item body with the surrounding
+|\parindent|. In this case:
+\begin{verbatim}
+leftmargin=\parindent
+\end{verbatim}
+
+A third pattern would be to align the label with |\parindent|
+and the item body with |2\parindent|:
+\begin{verbatim}
+labelindent=\parindent,
+leftmargin=2\parindent,
+itemsep=*
+\end{verbatim}
+Again, a variant would be to align the label with the surrounding
+text and the itembody with |\parindent|:
+\begin{verbatim}
+leftmargin=\parindent,
+itemsep=*
+\end{verbatim}
+
+Note here |\parindent| means the global value applied
+to normal paragraphs.
+
+\section{The trivlist issue}
+
+\LaTeX{} uses a simplified version of |list| named |trivlist| to set
+displayed material, like |center|, |verbatim|, \verb|tabbing|,
+\verb|theorem|, etc., even if conceptually they are not lists.
+Unfortunately, |trivlist| uses the current list settings, which has
+the odd side effect that changing the vertical spacing of lists also
+changes sometimes the spacing in these environments.
+
+This package modifies |trivlist| so that the default settings for 
+the current level (ie, those set by the corresponding |clo| 
+files) are set again. In standard \LaTeX{} that is usually redundand, 
+but if we want to fine tune lists, not resetting the default values 
+could be a real issue (particularly if you use the |nolistsep| 
+option).
+
+A minimal control of vertical spacing has been made possible 
+with\footnote{\verb|\string\setdisplayed| is deprecated.}
+\begin{itemize}
+\item |\setlist[trivlist,<level>]{<keys/values>}|
+\end{itemize}
+but |trivlist| itself, which is not used directly very
+often, does not accept an optional argument. This feature
+is not intended as a full-fledge |trivlist| formatter.
+
+If for some reason you do not want to change |trivlist|
+and preserve the original definition, you can use the
+package option |ignoredisplayed|.
+
+\section{Samples}
+
+\expandafter\ifx\csname setenumerate\endcsname\relax
+
+Please, install first the package and then typeset this
+document again.
+
+\else
+
+In these samples we set |\setlist{noitemsep}|
+
+\setlist{noitemsep}
+\small
+
+\newcommand{\newsample}{\vskip6pt\goodbreak\hrule height 1pt\vskip6pt}
+\newcommand{\samplesep}{\vskip6pt\goodbreak\hrule\vskip6pt}
+\newbox\vsep
+\setbox\vsep\hbox{\vrule height 2ex depth 16ex width 1pt}
+\dp\vsep0pt
+\newcommand\showsep{\leavevmode\llap{\copy\vsep}}
+
+\newsample
+
+\begin{verbatim}
+En un lugar de la Mancha, de cuyo nombre no quiero acordarme,
+no ha mucho tiempo que viv\'{\i}a un hidalgo de los de
+\begin{enumerate}[labelindent=\parindent,leftmargin=*]
+  \item lanza en astillero,
+  \item adarna antigua,
+  \item roc\'{\i}n flaco, y
+  \item galgo corredor.
+\end{enumerate}
+Una olla de algo m\'{a}s vaca que carnero, salpic\'{o}n las m\'{a}s
+noches, duelos y quebrantos los s\'{a}bados...
+\end{verbatim}
+
+The rule shows \verb|labelindent|. 
+
+\samplesep
+
+\showsep En un lugar de la Mancha, de cuyo nombre no quiero acordarme,
+no ha mucho tiempo que viv\'{\i}a un hidalgo de los de
+\begin{enumerate}[labelindent=\parindent,leftmargin=*]
+\item lanza en astillero,
+\item adarna antigua,
+\item roc\'{\i}n flaco, y
+\item galgo corredor.
+\end{enumerate}
+Una olla de algo m\'{a}s vaca que carnero, salpic\'{o}n las m\'{a}s
+noches, duelos y quebrantos los s\'{a}bados...
+
+\newsample
+
+With |\begin{enumerate}[leftmargin=*] % labelindent=0pt by default|. 
+
+The rule shows \verb|labelindent|.
+
+\samplesep
+
+\noindent\showsep\hskip\parindent En un lugar de la Mancha, de cuyo nombre no quiero acordarme,
+no ha mucho tiempo que viv\'{\i}a un hidalgo de los de
+\begin{enumerate}[leftmargin=*]
+\item lanza en astillero,
+\item adarna antigua,
+\item roc\'{\i}n flaco, y
+\item galgo corredor.
+\end{enumerate}
+Una olla de algo m\'{a}s vaca que carnero, salpic\'{o}n las m\'{a}s
+noches, duelos y quebrantos los s\'{a}bados...
+
+\newsample
+
+With |\begin{enumerate}[leftmargin=\parindent]|.
+
+The rule shows \verb|leftmargin|.
+
+\samplesep
+
+\showsep En un lugar de la Mancha, de cuyo nombre no quiero acordarme,
+no ha mucho tiempo que viv\'{\i}a un hidalgo de los de
+\begin{enumerate}[leftmargin=\parindent]
+\item lanza en astillero,
+\item adarna antigua,
+\item roc\'{\i}n flaco, y
+\item galgo corredor.
+\end{enumerate}
+Una olla de algo m\'{a}s vaca que carnero, salpic\'{o}n las m\'{a}s
+noches, duelos y quebrantos los s\'{a}bados...
+
+\newsample
+
+With |\begin{enumerate}[labelindent=\parindent,|\allowbreak
+| leftmargin=*,|\allowbreak| label=\Roman*.,|\allowbreak
+| widest=IV,|\allowbreak| align=left]|.
+
+The rule shows \verb|labelindent|.
+
+\samplesep
+
+\showsep En un lugar de la Mancha, de cuyo nombre no quiero acordarme,
+no ha mucho tiempo que viv\'{\i}a un hidalgo de los de
+\begin{enumerate}[labelindent=\parindent, leftmargin=*,
+                  label=\Roman*., widest=IV, align=left]
+\item lanza en astillero,
+\item adarna antigua,
+\item roc\'{\i}n flaco, y
+\item galgo corredor.
+\end{enumerate}
+Una olla de algo m\'{a}s vaca que carnero, salpic\'{o}n las m\'{a}s
+noches, duelos y quebrantos los s\'{a}bados...
+
+\newsample
+
+With |\begin{enumerate}[label=\fbox{\arabic*}]|. A reference to
+the first item is \ref{i:first}
+
+\samplesep
+
+En un lugar de la Mancha, de cuyo nombre no quiero acordarme,
+no ha mucho tiempo que viv\'{\i}a un hidalgo de los de
+\begin{enumerate}[label=\fbox{\arabic*}]
+\item \label{i:first}lanza en astillero,
+\item adarna antigua,
+\item roc\'{\i}n flaco, y
+\item galgo corredor.
+\end{enumerate}
+Una olla de algo m\'{a}s vaca que carnero, salpic\'{o}n las m\'{a}s
+noches, duelos y quebrantos los s\'{a}bados...
+
+\newsample
+
+With nested lists.
+
+\samplesep
+
+\begin{verbatim}
+En un lugar de la Mancha, de cuyo nombre no quiero acordarme,
+no ha mucho tiempo que viv\'{\i}a un hidalgo de los de
+\begin{enumerate}[label=(\alph*), labelindent=\parindent,
+     leftmargin=*, start=12]
+\item lanza en astillero,
+\begin{enumerate}[label=(\alph{enumi}.\roman*), leftmargin=*, start=7]
+\item adarna antigua,
+\end{enumerate}
+\item roc\'{\i}n flaco, y
+\begin{enumerate}[label=(\alph{enumi}.\roman*), leftmargin=*, resume]
+\item galgo corredor.
+\end{enumerate}
+\end{enumerate}
+Una olla de algo m\'{a}s vaca que carnero, salpic\'{o}n las m\'{a}s
+noches, duelos y quebrantos los s\'{a}bados...
+\end{verbatim}
+
+En un lugar de la Mancha, de cuyo nombre no quiero acordarme,
+no ha mucho tiempo que viv\'{\i}a un hidalgo de los de
+\begin{enumerate}[label=(\alph*), labelindent=\parindent,
+     leftmargin=*, start=12]
+\item lanza en astillero,
+\begin{enumerate}[label=(\alph{enumi}.\roman*), leftmargin=*, start=7]
+\item adarna antigua,
+\end{enumerate}
+\item roc\'{\i}n flaco, y
+\begin{enumerate}[label=(\alph{enumi}.\roman*), leftmargin=*, resume]
+\item galgo corredor.
+\end{enumerate}
+\end{enumerate}
+Una olla de algo m\'{a}s vaca que carnero, salpic\'{o}n las m\'{a}s
+noches, duelos y quebrantos los s\'{a}bados...
+
+\newsample
+
+\begin{verbatim}
+En un lugar de la Mancha, de cuyo nombre no quiero acordarme,
+no ha mucho tiempo que viv\'{\i}a un hidalgo de los de
+\begin{description}[font=\sffamily\bfseries, leftmargin=3cm,
+    style=nextline]
+  \item[Lo primero que ten\'{\i}a el Quijote] lanza en astillero,
+  \item[Lo segundo] adarna antigua,
+  \item[Lo tercero] roc\'{\i}n flaco, y
+  \item[Y por \'{u}ltimo, lo cuarto] galgo corredor.
+\end{description}
+Una olla de algo m\'{a}s vaca que carnero, salpic\'{o}n las m\'{a}s
+noches, duelos y quebrantos los s\'{a}bados...
+\end{verbatim}
+
+\samplesep
+
+En un lugar de la Mancha, de cuyo nombre no quiero acordarme,
+no ha mucho tiempo que viv\'{\i}a un hidalgo de los de
+\begin{description}[font=\sffamily\bfseries, leftmargin=3cm,
+    style=nextline]
+\item[Lo primero que ten\'{\i}a el Quijote] lanza en astillero,
+\item[Lo segundo] adarna antigua,
+\item[Lo tercero] roc\'{\i}n flaco, y
+\item[Y por \'{u}ltimo, lo cuarto] galgo corredor.
+\end{description}
+Una olla de algo m\'{a}s vaca que carnero, salpic\'{o}n las m\'{a}s
+noches, duelos y quebrantos los s\'{a}bados...
+
+\newsample
+
+Same, but with |sameline|.
+
+\samplesep
+
+En un lugar de la Mancha, de cuyo nombre no quiero acordarme,
+no ha mucho tiempo que viv\'{\i}a un hidalgo de los de
+\begin{description}[font=\sffamily\bfseries, leftmargin=3cm,
+    style=sameline]
+\item[Lo primero que ten\'{\i}a el Quijote] lanza en astillero,
+\item[Lo segundo] adarna antigua,
+\item[Lo tercero] roc\'{\i}n flaco, y
+\item[Y por \'{u}ltimo, lo cuarto] galgo corredor.
+\end{description}
+Una olla de algo m\'{a}s vaca que carnero, salpic\'{o}n las m\'{a}s
+noches, duelos y quebrantos los s\'{a}bados...
+
+\newsample
+
+Same, but with |multiline|. Note the text overlaps if
+the item body is too short.
+
+\samplesep
+
+En un lugar de la Mancha, de cuyo nombre no quiero acordarme,
+no ha mucho tiempo que viv\'{\i}a un hidalgo de los de
+\begin{description}[font=\sffamily\bfseries, leftmargin=3cm,
+    style=multiline]
+\item[Lo primero que ten\'{\i}a el Quijote] lanza en astillero,
+\item[Lo segundo] adarna antigua,
+\item[Lo tercero] roc\'{\i}n flaco, y
+\item[Y por \'{u}ltimo, lo cuar] galgo corredor.
+\end{description}
+Una olla de algo m\'{a}s vaca que carnero, salpic\'{o}n las m\'{a}s
+noches, duelos y quebrantos los s\'{a}bados...
+
+\fi
+
+\normalsize
+
+\section{Afterword}
+
+\subsection{\LaTeX{} lists}
+
+As it is well known, \LaTeX{} predefines three lists:
+\texttt{enumerate}, \texttt{itemize} and \texttt{description}.  This
+is a very frequent classification which can also be found in, say,
+HTML. However, there is a more general model based in three
+fields---namely, label, title, and body---, so that enumerate and
+itemize has label (numbered and unnumbered) but no title, while
+description has title but no label.  In this model, one can have a
+description with entries marked with labels, as for example (of 
+course, this simple solution is far from satistactory):
+\begin{verbatim}
+\newcommand\litem[1]{\item{\bfseries #1,\enspace}}
+\begin{itemize}[label=\textbullet]
+\litem{Lo primero que ten\'{\i}a el Quijote} lanza en astillero,
+... etc.
+\end{verbatim}
+
+\vskip6pt
+\goodbreak
+\hrule
+\vskip6pt
+
+\newcommand\litem[1]{\item{\bfseries #1,\enspace}}
+En un lugar de la Mancha, de cuyo nombre no quiero acordarme,
+no ha mucho tiempo que viv\'{\i}a un hidalgo de los de
+\begin{itemize}[label=\textbullet]
+\litem{Lo primero que ten\'{\i}a el Quijote} lanza en astillero,
+\litem{Lo segundo} adarna antigua,
+\litem{Lo tercero} roc\'{\i}n flaco, y
+\litem{Y por \'{u}ltimo, lo cuarto} galgo corredor.
+\end{itemize}
+
+\vskip6pt
+\goodbreak
+\hrule
+\vskip6pt
+
+This format in not infrequent at all and a tool for defining them is 
+on the way and at a very advanced stage. It has not been include in 
+version 3.0 because I'm not sure if the proper place is this package 
+or \textsf{titlesec} and it is not stable enough yet.
+
+\subsection{Known issues}
+
+\begin{itemize}
+
+\item
+List resuming is based on environment names, and when a
+|\newenvironment| contains a list you may want to use |\begin| and
+|\end|.  Using the corresponding commands, however, is not an error,
+but it is your responsability to make sure the result is correct.
+
+\item
+It seems there is no way to catch a misspelled name in |\setlist|
+and a meaningless error ``Missing number, treated as zero'' is raised.
+
+\item The behaviour of mixed boxed labels (including enumerate and
+itemize) and unboxed labels is not well-defined.  The same applies to
+boxed and unboxed inline lists (which could even raise an error).
+Similarly, resuming a series and a list at the same time is allowed,
+too, but again its behaviour is not well-defined.
+
+\item (3.5.2) An incompatibility with 2.x has popped up -- if you were
+using the optional argument to pass a value to a \verb|\ref| or other 
+macro requiring expandable macros, an error is raised. A quick fix 
+is letting \verb|\makelabel| to |\descriptionlabel| in \texttt{before}.
+
+\end{itemize}
+
+\subsection{What's new in 3.0}
+
+\begin{itemize}
+\item Inline lists, with keys to set how items are joined (ie, the
+punctuation between items).  Two modes are provided: \verb|boxed|  and
+\verb|unboxed|.
+
+\item \verb|\setlist| is \textsf{calc}-savvy (eg, for use in loops),
+and you can set diferent lists and levels at once.  \item All lengths
+related to labels can take the value \verb|*| (and not only
+\verb|labelsep| and \verb|leftmargin|).  Its behaviour has been made
+consistent and there is new value \verb|!| which does not compute the
+widest label.
+
+\item With \verb|\restartlist{<list-name>}|, list counters can be restarted (in
+case you are using \verb|resume|).
+
+\item \verb|resume*| can be combined with other keys.
+
+\item Lists can be gathered globally using series, so that they are
+considered a single list.  To start a series just use
+|series=<series-name>| and then resume it with |resume=<series-name>| or
+|resume*=<series-name>|.
+
+\item The ``experimental'' \verb|fullwidth| has been replaced by a new key
+\verb|wide|.
+
+\item|\SetLabelAlign| defines new align values.
+
+\item You can define ``abstract'' values (eg, \verb|label=numeric|) and
+new keys.
+\end{itemize}
+
+\begin{itemize}
+\item (3.2) \verb|start| and \verb|widest*| are \textsf{calc}-savvy.
+\item (3.2) \verb|\value| can be used with \verb|widest*|.
+\item (3.2) Some internal restrictions in \verb|\arabic| and the like
+has been removed.  It is more flexible at the cost of having a more
+``relaxed'' error checking.
+\end{itemize}
+\subsection{Bug fixes}
+
+\begin{itemize}
+\item Star values (eg, \verb|leftmargin=*|) could not be overriden
+and new values were ignored.
+\item \verb|nolistsep| as the first of several keys was not always
+recognized and therefore treated like a short label
+(i.e., \verb|nol\roman*stsep|).
+\item \verb|labelwidth| did not always work (when there was a prior
+\verb|widest| and \verb|*|)
+\item With \verb|align=right| the label and the following text could
+overlap.
+\item \verb|description| did not get the correct list level.
+\item At some point (2.x?) \verb|\value*| stopped working.
+\item (3.1) Unfortunately, \textsf{xkeyval} ``kills'' 
+\textsf{keyval}, so the lattest has been replicated in 
+\textsf{enumitem}.
+\item (3.3) Fixes a serious bug -- with \verb|*| neither 
+\verb|itemize| nor \verb|description| worked.
+\item (3.4) Fixes bad spacing in mode boxed (misplaced \verb|\unskip| 
+before the first item and wrong spacefactor between items).
+\item (3.4) \verb|nolistsep| did not work as intended, but since the
+error has been there for several years, a new key \verb|nosep| is
+provided.
+\item (3.4) The issue with \verb|nolistsep| with \verb|shortlabels| 
+(see above) was not fixed in all cases. Hopefully now it is.
+\item (3.5.0) Fixed the fix related to the spacefactor between items.
+\item (3.5.0) Fixed a problem with nested boxed inline lists.
+\item (3.5.1) \texttt{resume*} only worked once, and subsequent ones
+bahaved like \texttt{resume}.
+\item (3.5.2) Fixed |\setlist*|, which didn't work.
+\end{itemize}
+
+
+\subsection{Acknowledgements}
+
+I wish to thank particularly the comments and suggestions from Lars
+Madsen, who has found some bugs, too.
+
+\end{document}
