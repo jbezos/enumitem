@@ -64,6 +64,7 @@ tensind, esindex, dotlessi, titlesec, titletoc}.}}
 \begin{document}
 
 \maketitle
+\tableofcontents
 
 \section{Introduction}
 
@@ -833,9 +834,9 @@ environments behaving like them.  To define a new lists (or redefine a
 existing one), use |\newlist| (or |\renewlist|), where |<type>| is
 |enumerate|, |itemize| or |description|.
 
-If <type> is |enumerate|, a set of counters with names |<name>i|,
-|<name>ii|, |<name>iii|, |<name>iv|, etc.  (depending on <max-depth>)
-is defined.  Don't use an arbitrarily large number for <max-depth>, to
+If |<type>| is |enumerate|, a set of counters with names |<name>i|,
+|<name>ii|, |<name>iii|, |<name>iv|, etc.  (depending on |<max-depth>|)
+is defined.  Don't use an arbitrarily large number for |<max-depth>|, to
 avoid creating too many counters.  Then you can use those counters in
 labels; e.  g., if you have defined a list named \texttt{steps}, you
 can define a label with:
