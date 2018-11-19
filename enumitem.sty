@@ -1,25 +1,17 @@
-% +--------------------------------------------------+
-% | Typeset enumitem.tex to get the documentation.   |
-% +--------------------------------------------------+
 %
-% Copyright (c) 2003-2011 by Javier Bezos.
-% All Rights Reserved.
+% Copyright (C) 2003-2018 Javier Bezos http://www.texnia.com
 %
-% This file is part of the enumitem distribution release 3.5.2
-% -----------------------------------------------------------
-% 
-% It may be distributed and/or modified under the
-% conditions of the LaTeX Project Public License, either version 1.3
-% of this license or (at your option) any later version.
-% The latest version of this license is in
-%   http://www.latex-project.org/lppl.txt
-% and version 1.3 or later is part of all distributions of LaTeX
-% version 2003/12/01 or later.
-% 
-% This work has the LPPL maintenance status "maintained".
-% 
-% The Current Maintainer of this work is Javier Bezos.
+% This file may be distributed and/or modified under the conditions of
+% the MIT License. A version can be found at the end of this file.
 %
+% Repository: https://github.com/jbezos/enumitem
+%
+% Release
+% ~~~~~~~
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{enumitem}[2018/11/19 v3.5.1465 Customized lists]
+
 % Notes
 % ~~~~~
 %
@@ -40,21 +32,15 @@
 % - Define keys with values
 % - Revise @nobreak
 %
-% Release
-% ~~~~~~~
-
-\NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{enumitem}[2011/09/28 v3.5.2 Customized lists]
-
 % +=============================+
 % |      EMULATING KEYVAL       |
 % +=============================+
 %
-% "Thanks" to xkeyval, which use the same macros names as
+% "Thanks" to xkeyval, which uses the same macro names as
 % keyval :-(, the latter has to be replicated in full here
-% to ensure it works as intended. The original work if by
+% to ensure it works as intended. The original work is by
 % David Carlisle, under license LPPL. Once the code is here,
-% it could be optimized by adpting it to the specific needs
+% it could be optimized by adapting it to the specific needs
 % of titlesec (to do).
 
 \def\enitkv@setkeys#1#2{%
@@ -63,9 +49,9 @@
   \enitkv@do#2,\relax,}
 
 \def\enitkv@do#1,{%
- \ifx\relax#1\empty\else
-  \enitkv@split#1==\relax
-  \expandafter\enitkv@do\fi}
+  \ifx\relax#1\empty\else
+    \enitkv@split#1==\relax
+    \expandafter\enitkv@do\fi}
 
 \def\enitkv@split#1=#2=#3\relax{%
   \enitkv@@sp@def\@tempa{#1}%
@@ -124,23 +110,25 @@
     {\csname enitkv@#1@#2\endcsname{#3}}%
   \@namedef{enitkv@#1@#2}##1}
 
+% This ends the code copied from keyval (under LPPL).
+
 % +=============================+
 % |        DEFINITIONS          |
 % +=============================+
 %
 % (1) The package uses a token register very often. To be on the
-%   safe side, instead of \toks@, etc., a new one is declared.
+%     safe side, instead of \toks@, etc., a new one is declared.
 % (2) \enit@inbox is the box storing the items in boxed inline
-%   lists.
+%     lists.
 % (3) \enit@outerparindent is used to save the outer parindent 
-%   so that it can be used in the key parindent 
+%     so that it can be used in the key parindent 
 % (4) \enit@type has three values: 0 = enum, 1 = item, 2 = desc.
 % (5) \enit@calc stores which dimen is to be computed:
-%   0=labelindent, 1=labelwidth, 2=labelsep, 3=leftmargin,
-%   4=itemindent
+%     0=labelindent, 1=labelwidth, 2=labelsep, 3=leftmargin,
+%     4=itemindent
 % (6) \enit@resuming has four values: 0 = none, 1 = series,
-%   2 = resume* series (computed in group enumitem-resume),
-%   3 = resume* list (ie, with no value).
+%     2 = resume* series (computed in group enumitem-resume),
+%     3 = resume* list (ie, with no value).
 
 \chardef  \enit@iv=4
 \newlength\labelindent
@@ -166,7 +154,7 @@
 % ===================
 
 \def\enit@error{\PackageError{enumitem}}
-  
+
 \def\enit@checkerror#1#2{%
   \enit@error{Unknown value `#2' for key `#1'}%
       {See the manual for valid values}} 
@@ -208,7 +196,6 @@
          \csname @list\romannumeral\the\@listdepth\expandafter\endcsname
          \csname @list\romannumeral\the\count@\endcsname}{}%
   \fi}
-
 
 % +=============================+
 % |            KEYS             |
@@ -351,7 +338,7 @@
 
 \def\enitkv@enumitem@resume@default{%
   \@nameuse{enit@resume@\@currenvir}\relax}
-  
+
 \@namedef{enitkv@enumitem-resume@resume*}#1{%
   \enit@checkseries@m
   \let\enit@resuming\tw@
@@ -383,16 +370,16 @@
 
 % Penalties
 % =========
-  
+
 \enitkv@key{enumitem}{beginpenalty}{%
   \@beginparpenalty#1\relax}
-  
+
 \enitkv@key{enumitem}{midpenalty}{%
   \@itempenalty#1\relax}
 
 \enitkv@key{enumitem}{endpenalty}{%
   \@endparpenalty#1\relax}
-   
+
 % Font/Format
 % ===========
 
@@ -489,7 +476,7 @@
 % in the same hierarchy level. Explicit refs above the
 % current hierarchy level are overriden by label (besides ref),
 % too. Since an explicit ref has preference, it's delayed.
-  
+
 \enitkv@key{enumitem}{ref}{%
   \g@addto@macro\enit@delayedkeys{,ref=#1}}
 
@@ -670,7 +657,7 @@
 
 % Miscelaneous keys
 % ================
-  
+
 \enitkv@key{enumitem}{nolistsep}[true]{%
   \partopsep=\z@skip
   \topsep=\z@ plus .1pt
@@ -682,7 +669,6 @@
   \topsep=\z@skip
   \itemsep=\z@skip
   \parsep=\z@skip}
-
 
 \enitkv@key{enumitem}{noitemsep}[true]{%
   \itemsep=\z@skip
@@ -859,7 +845,7 @@
   \def\enit@depth{#2}%
   \edef\enit@prevlabel{#3\romannumeral#2}%
   \advance#2\@ne}
-     
+
 \def\enit@preset#1#2#3{%
    \enit@sepfrommarginfalse
    \enit@calcwidestfalse
@@ -1229,7 +1215,7 @@
 \@namedef{enit@itemize*}{%
   \let\enit@list\enit@inlist
   \enit@itemize@i}
-  
+
 \def\enit@itemize@i#1#2#3#4{%
   \ifnum#1>#3\relax
     \enit@toodeep
@@ -1503,7 +1489,7 @@
   \@ifundefined{enit@xset@#3}%
     {\enit@error{Unknown list type `#3')}%
           {Valid types are:
-           enumerate, itemize, description,\messageBreak
+           enumerate, itemize, description,\MessageBreak
            enumerate*, itemize*, description*}}%
     {}%
   \setcounter{enit@cnt}{#4}%
@@ -1590,4 +1576,51 @@
 
 \fi
 
+
+% +=============================+
+% |            TOOLS            |
+% +=============================+
+
+\def\DrawEnumitemLabel{% TODO - if before \item
+  \hbox{\hskip\@totalleftmargin
+        \hskip-\leftmargin
+        \vrule width \leftmargin height 8pt depth -7pt
+        \hskip\itemindent
+        \ifdim\labelindent<\z@
+          \hskip-\leftmargin
+          \hskip\labelindent
+          \vrule width -\labelindent height 6pt depth -5pt
+          \hskip\labelindent            
+        \else
+          \hskip-\labelsep
+          \hskip-\labelwidth
+          \hskip-\labelindent
+          \vrule width \labelindent height 6pt depth -4pt           
+        \fi
+        \vrule width \labelwidth height 4pt depth -2pt
+        \vrule width \labelsep height 2pt}}
+
+
 \endinput
+
+MIT License
+-----------
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
