@@ -10,7 +10,7 @@
 % ~~~~~~~
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{enumitem}[2018/11/19 v3.5.1465 Customized lists]
+\ProvidesPackage{enumitem}[2018/11/20 v3.5.1466 Customized lists]
 
 % Notes
 % ~~~~~
@@ -150,6 +150,27 @@
 \def\enit@meaning{\expandafter\strip@prefix\meaning}
 \def\enit@noexcs#1{\expandafter\noexpand\csname#1\endcsname}
 
+\long\def\enit@afterelse#1\else#2\fi{\fi#1}
+\long\def\enit@afterfi#1\fi{\fi#1}
+\def\enit@ifunset#1{%
+  \expandafter\ifx\csname#1\endcsname\relax
+    \expandafter\@firstoftwo
+  \else
+    \expandafter\@secondoftwo
+  \fi}
+\enit@ifunset{ifcsname}%
+  {}%
+  {\def\enit@ifunset#1{%
+     \ifcsname#1\endcsname
+       \expandafter\ifx\csname#1\endcsname\relax
+         \enit@afterelse\expandafter\@firstoftwo
+       \else
+         \enit@afterfi\expandafter\@secondoftwo
+       \fi
+     \else
+       \expandafter\@firstoftwo
+     \fi}}
+
 % Miscelaneous errors
 % ===================
 
@@ -191,7 +212,7 @@
   \else
     \count@\@listdepth
     \global\advance\@listdepth\@ne
-    \@ifundefined{@list\romannumeral\the\@listdepth}%
+    \enit@ifunset{@list\romannumeral\the\@listdepth}%
       {\expandafter\let
          \csname @list\romannumeral\the\@listdepth\expandafter\endcsname
          \csname @list\romannumeral\the\count@\endcsname}{}%
@@ -218,6 +239,9 @@
 
 \enitkv@key{enumitem}{topsep}{%
   \setlength\topsep{#1}}
+  
+% \enitkv@key{enumitem}{bottomsep}{%
+  % \def\enit@bottomsep{#1}}
 
 \enitkv@key{enumitem}{itemsep}{%
   \setlength\itemsep{#1}}
@@ -324,7 +348,7 @@
 \enitkv@key{enumitem-resume}{series}{%
   \enit@checkseries@m
   \let\enit@resuming\@ne
-  \@ifundefined{enitkv@enumitem@#1}{}%
+  \enit@ifunset{enitkv@enumitem@#1}{}%
     {\enit@error{Invalid series name `#1'}%
        {Do not name a series with an existing key}}%
   \def\enit@series{#1}}
@@ -343,7 +367,7 @@
   \enit@checkseries@m
   \let\enit@resuming\tw@
   \edef\enit@series{#1}%
-  \@ifundefined{enit@resumekeys@series@#1}%
+  \enit@ifunset{enit@resumekeys@series@#1}%
     {\enit@noserieserror{#1}}%
     {\expandafter\let\expandafter\enit@resumekeys
          \csname enit@resumekeys@series@#1\endcsname}}
@@ -358,7 +382,7 @@
   \enit@checkseries{resume*}}
 
 \newcommand\restartlist[1]{%
-  \@ifundefined{end#1}%
+  \enit@ifunset{end#1}%
     {\enit@error{Undefined list `#1'}%
       {No list has been defined with that name.}}%
     {\expandafter\let
@@ -393,7 +417,7 @@
 % ==================
 
 \enitkv@key{enumitem}{style}[normal]{%
-  \@ifundefined{enit@style@#1}%
+  \enit@ifunset{enit@style@#1}%
     {\enit@checkerror{style}{#1}}%
     {\enit@nextlinefalse
      \enit@boxdescfalse
@@ -427,7 +451,7 @@
 % --------
 
 \enitkv@key{enumitem}{align}{%
-  \@ifundefined{enit@align@#1}%
+  \enit@ifunset{enit@align@#1}%
     {\enit@checkerror{align}{#1}}%
     {\csname enit@align@#1\endcsname}}
 
@@ -555,7 +579,7 @@
 % ----
 
 \enitkv@key{enumitem}{mode}{%
-  \@ifundefined{enit@mode#1}%
+  \enit@ifunset{enit@mode#1}%
     {\enit@checkerror{mode}{#1}}%
     {\csname enit@mode#1\endcsname}}
 
@@ -600,7 +624,7 @@
   \in@{=}{#1}% Quick test, if contains =, it's key=value
   \ifin@\else
     \enitkv@@sp@def\enit@a{#1}%
-    \@ifundefined{enitkv@enumitem@\enit@meaning\enit@a}%
+    \enit@ifunset{enitkv@enumitem@\enit@meaning\enit@a}%
       {\ifnum\enit@type=\z@
          \def\enit@elt{\enit@replace\enit@a}%
          \enit@marklist % Returns \enit@toks
@@ -696,15 +720,15 @@
 % ------------
 
 \newcommand\SetEnumitemValue[2]{% Implicit #3
-  \@ifundefined{enit@enitkv@#1}%
-    {\@ifundefined{enitkv@enumitem@#1}%
+  \enit@ifunset{enit@enitkv@#1}%
+    {\enit@ifunset{enitkv@enumitem@#1}%
        {\enit@error{Wrong key `#1' in \string\SetEnumitemValue}%
           {Perhaps you have misspelled it}}{}%
      \expandafter\let\csname enit@enitkv@#1\expandafter\endcsname
        \csname enitkv@enumitem@#1\endcsname}{}%
   \@namedef{enitkv@enumitem@#1}##1{%
     \def\enit@a{##1}%
-    \@ifundefined{enit@enitkv@#1@\enit@meaning\enit@a}%
+    \enit@ifunset{enit@enitkv@#1@\enit@meaning\enit@a}%
       {\@nameuse{enit@enitkv@#1}{##1}}%
       {\@nameuse{enit@enitkv@#1\expandafter\expandafter\expandafter}%
          \expandafter\expandafter\expandafter
@@ -715,7 +739,7 @@
 % -------------
 
 \newcommand\SetEnumitemKey[2]{%
-  \@ifundefined{enitkv@enumitem@#1}%
+  \enit@ifunset{enitkv@enumitem@#1}%
     {\enitkv@key{enumitem}{#1}[]{\enitkv@setkeys{enumitem}{#2}}}%
     {\enit@error{Duplicated key `#1' in \string\SetEnumitemKey}%
        {There already exists a key with that name}}}
@@ -728,7 +752,7 @@
 % ========
 
 \def\enit@setkeys#1{%
-  \@ifundefined{enit@@#1}{}%
+  \enit@ifunset{enit@@#1}{}%
     {\expandafter\expandafter\expandafter
      \enit@setkeys@i\csname enit@@#1\endcsname\@@}}
 
@@ -754,7 +778,7 @@
 \def\enit@getwidth#1#2#3#4{%
   \let#4#3%
   \def#3##1{%
-    \@ifundefined{enit@widest\expandafter\@gobbletwo\string##1}% if no widest=key
+    \enit@ifunset{enit@widest\expandafter\@gobbletwo\string##1}% if no widest=key
       {#1}%
       {\csname enit@widest\expandafter\@gobbletwo\string##1\endcsname{#4}}}}
 
@@ -767,7 +791,7 @@
 \def\enit@calcwidth{%
   \ifenit@calcwidest
     \ifnum\enit@type=\z@ % ie, enum
-      \@ifundefined{enit@cw@\@enumctr}%
+      \enit@ifunset{enit@cw@\@enumctr}%
         {\@namedef{enit@cv@\@enumctr}{\enit@valueerror\@enumctr}}%
         {\edef\enit@values{%
            \enit@values
@@ -876,7 +900,7 @@
 % resume*=<series>
 
 \def\enitkv@err@a#1{%
-   \@ifundefined{enit@resumekeys@series@\@tempa}{}%
+   \enit@ifunset{enit@resumekeys@series@\@tempa}{}%
      {\@nameuse{enitkv@enumitem-resume@resume*\expandafter}%
         \expandafter{\@tempa}}}
 
@@ -885,7 +909,7 @@
 % processed in enumitem-resume
 
 \def\enitkv@err@b#1{%
-   \@ifundefined{enit@resumekeys@series@\@tempa}%
+   \enit@ifunset{enit@resumekeys@series@\@tempa}%
      {\enit@savekverr{#1}}%
      {}}
 
@@ -1033,7 +1057,7 @@
     \else
       \ifenit@noinitem\else
         \ifhmode\unskip\fi
-        \@ifundefined{enit@itemjoin@s}%
+        \enit@ifunset{enit@itemjoin@s}%
           {\enit@itemjoin}%
           {\enit@itemjoin@s}%
       \fi
@@ -1289,14 +1313,27 @@
   \parsep\parskip
   \csname @list\romannumeral\the\@listdepth\endcsname
   \@nmbrlistfalse
+  \enit@setglobalkeys % ie, list and list<num>
   \enit@setkeys{trivlist}%
   \enit@setkeys{trivlist\romannumeral\@listdepth}%
+  \enit@setkeys{\@currenvir}%
+  \enit@setkeys{\@currenvir\romannumeral\@listdepth}%
   \@trivlist
   \labelwidth\z@
   \leftmargin\z@
   \itemindent\z@
   \let\@itemlabel\@empty
   \def\makelabel##1{##1}}
+  
+% Let's recognize also the standard trivlists (except defined with)
+  
+\let\enitdp@quote\@empty
+\let\enitdp@quotation\@empty
+\let\enitdp@verse\@empty
+\let\enitdp@thebibliography\@empty
+\let\enitdp@center\@empty
+\let\enitdp@flushleft\@empty
+\let\enitdp@flushright\@empty
 
 % Description styles
 % ==================
@@ -1430,9 +1467,9 @@
   \let\enit@c\@empty
   \protected@edef\enit@a{#2}%
   \@for\enit@a:=\enit@a\do{% the 2nd enit@a is first expanded
-    \@ifundefined{enitdp@\enit@meaning\enit@a}%
+    \enit@ifunset{enitdp@\enit@meaning\enit@a}%
       {\edef\enit@c{\enit@c\enit@eltlevels{\enit@a}}}%
-      {\@ifundefined{enit@short\enit@meaning\enit@a}%
+      {\enit@ifunset{enit@short\enit@meaning\enit@a}%
          \@empty
          {\edef\enit@a{\@nameuse{enit@short\enit@a}}}%
        \edef\enit@b{\enit@b\enit@eltnames{\enit@a}}}}%
@@ -1473,7 +1510,7 @@
 
 \def\enit@xset@enumerate{%
   \enit@xset@itemize
-  \@ifundefined{c@\enit@c\romannumeral\count@}%
+  \enit@ifunset{c@\enit@c\romannumeral\count@}%
     {\@definecounter{\enit@c\romannumeral\count@}}{}}
 \@namedef{enit@xset@enumerate*}{\enit@xset@enumerate}
 
@@ -1486,7 +1523,7 @@
 % <new/renew>, <name>, <type>, <max-depth>
 
 \def\enit@newlist#1#2#3#4{%
-  \@ifundefined{enit@xset@#3}%
+  \enit@ifunset{enit@xset@#3}%
     {\enit@error{Unknown list type `#3')}%
           {Valid types are:
            enumerate, itemize, description,\MessageBreak
@@ -1494,7 +1531,7 @@
     {}%
   \setcounter{enit@cnt}{#4}%
   \count@\@ne
-  \@ifundefined{enit@short#2}%
+  \enit@ifunset{enit@short#2}%
     {\def\enit@c{#2}}%
     {\edef\enit@c{\csname enit@short#2\endcsname}}%
   \loop
@@ -1502,7 +1539,7 @@
     \ifnum\count@<\c@enit@cnt
     \advance\count@\@ne
   \repeat
-  \@ifundefined{enitdp@#2}%
+  \enit@ifunset{enitdp@#2}%
     {\expandafter\newcount\csname enitdp@#2\endcsname}{}%
   \csname enitdp@#2\endcsname\z@
   \advance\c@enit@cnt\m@ne
@@ -1529,6 +1566,11 @@
 \newif\ifenit@loadonly
 
 \DeclareOption{ignoredisplayed}{\let\enit@trivlist\trivlist}
+\DeclareOption{includedisplayed}{%
+  \def\enit@setglobalkeys{%
+    \enit@setkeys{list}%
+    \enit@setkeys{list\romannumeral\@listdepth}}}
+\let\enit@setglobalkeys\relax
 \DeclareOption{loadonly}{\enit@loadonlytrue}
 \DeclareOption{shortlabels}
   {\def\enit@shl#1{%
@@ -1576,7 +1618,6 @@
 
 \fi
 
-
 % +=============================+
 % |            TOOLS            |
 % +=============================+
@@ -1599,7 +1640,6 @@
         \fi
         \vrule width \labelwidth height 4pt depth -2pt
         \vrule width \labelsep height 2pt}}
-
 
 \endinput
 
