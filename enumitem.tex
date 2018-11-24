@@ -45,6 +45,9 @@
 \def\verbatim{\begin{shaded*}\bblxv\vskip-\baselineskip\vskip2.5\parsep}
 \def\endverbatim{\bblexv\vskip-2\baselineskip\end{shaded*}}
 
+\newcommand\New[1]{%
+  \colorbox[rgb]{.87, .9, .83}{New #1}\enspace\ignorespaces}
+
 \usepackage{hyperref}
 
 \title{Customizing lists\\with the\\\textsf{enumitem} package}
@@ -53,7 +56,7 @@
 suggestions go to \href{http://www.texnia.com/enumitem.html}%
 {\texttt{http://www.texnia.com/enumitem.html}}.}}
 
-\date{Version 3.5.1466\\2018/11/20}
+\date{Version 3.5.1470\\2018/11/24}
 
 \IfFileExists{enumitem.sty}{\usepackage{enumitem}}{}
 
@@ -73,23 +76,32 @@ suggestions go to \href{http://www.texnia.com/enumitem.html}%
 
 \section{Introduction}
 
-When I began to use \LaTeX{} long ago, two particular points
-annoyed me because I found customizing them was very complicated
----headlines/footlines and lists.  A new way to redefine the former is
-accomplished in my own \textsf{titleps} package, but none was
-available to customize the latter except:
 \begin{itemize}
-\item \textsf{enumerate}, which just allows to change the label, and
-it does it pretty well.
-
-\item \textsf{mdwlist}, which only ``provides some vaguely useful
-list-related commands and environments,'' as its manual states, and not
-a consistent way of handling lists.
-
-\item \textsf{paralist}, which provides lists within a paragraph (the
-original purpose of that package), a few other hard-wired specific
-changes, and the optional argument of \textsf{enumerate}.
+  \item A key/value interface.
+  \item Global settings.
+  \item An alternative way to set place the label, with a new 
+  parameter |labelindent|.
+  \item An enumerate-like syntax for setting the label format.
+  \item Define new lists.
 \end{itemize}
+
+% When I began to use \LaTeX{} long ago, two particular points
+% annoyed me because I found customizing them was very complicated
+% ---headlines/footlines and lists.  A new way to redefine the former is
+% accomplished in my own \textsf{titleps} package, but none was
+% available to customize the latter except:
+% \begin{itemize}
+% \item \textsf{enumerate}, which just allows to change the label, and
+% it does it pretty well.
+
+% \item \textsf{mdwlist}, which only ``provides some vaguely useful
+% list-related commands and environments,'' as its manual states, and not
+% a consistent way of handling lists.
+
+% \item \textsf{paralist}, which provides lists within a paragraph (the
+% original purpose of that package), a few other hard-wired specific
+% changes, and the optional argument of \textsf{enumerate}.
+% \end{itemize}
 
 In the interface a sort of ``inheritance'' is used. You can set
 globally the behaviour of lists and then override several parameters
@@ -127,7 +139,7 @@ Horizontal spacing:
 \end{itemize}
 
 \begin{example}
-  A straighforward example to set a list is:
+  A straighforward example is:
 \begin{verbatim}
 \begin{itemize}[itemsep=1ex,leftmargin=1cm]
 \end{verbatim}
@@ -374,6 +386,33 @@ The five parameteres are related in the following way:
 \verb|\leftmargin|+\verb|\itemindent| = 
 \verb|\labelindent|+\verb|\labelwidth|+\verb|\labelsep|
 \]
+
+\begin{desc}
+|left=<labelindent>|\\
+\verb|left=<labelindent> .. <leftmargin>|
+\end{desc}
+
+\New{3.6} This is a convenience key to set quickly the most common
+layouts for the label. You may regard it as a sort or ``rule'' with two
+tab stops: the start of the label and the start of the text. With only
+|<labelindent>|, the left margin (the ``start of text'') is computed
+with the |labelsep|.
+
+\begin{example}
+  Typical settings would be:
+\begin{verbatim}
+\begin{enumerate}[left= 0pt]
+\begin{enumerate}[left= 0pt .. \parindent]
+\begin{enumerate}[left= \parindent]
+\begin{enumerate}[left= \parindent .. 2\parindent]
+\begin{enumerate}[left= -\parindent .. 0pt]
+\end{verbatim}
+\end{example}
+
+\begin{note}
+  The label width is set to the default widest one. If there are lists
+  with Arabic numerals $\ge 10$, you may want to set |widest|, too.
+\end{note}
 
 \begin{desc}
 |leftmargin=!|\qquad|itemindent=!|\qquad|labelsep=!|
@@ -826,7 +865,7 @@ defined can then be used like the others.
   before=\raggedcolumns\begin{multicols}{2},
   after=\end{multicols}}
 \end{verbatim}
-  The settings for \texttt{itemsep} and \texttt{parsep} kill the
+  Here, the settings for \texttt{itemsep} and \texttt{parsep} kill the
   stretch and shrink parts.  Of course, you may want to define a
   new list.
 \end{example}
@@ -996,16 +1035,32 @@ you load this package you can write things like:
 \newcommand{\mylistname}{enumerate}
 \setlist[\mylistname,\value{toplist}+1]{labelsep=\itemindent+2em]
 \end{verbatim}
-This allows defining lists within loops.
-
-Currently, a way to discriminate the font size is not provided
-(|\normalsize|, |\small|\dots).
+This allows defining lists with the help of loops.
 
 \begin{warning}
   It seems there is no way to catch a misspelled name in |\setlist| or
   |\newlist|, and a meaningless error ``Missing number, treated as
   zero'' is raised.
 \end{warning}
+
+Currently, a way to discriminate the font size is not provided
+(|\normalsize|, |\small|\dots).\New{3.6} WORK IN PROGRESS: lengths can
+contain size-based settings as follows (the value before the first $<$ 
+is a default). Best top to bottom, because ``last wins''? Or change it
+to ``first wins''? TODO -- name based settings (remember [11pt] is
+10.95), an alternative
+|\setlist<size>|.
+\begingroup
+\makeatletter
+\renewcommand\verbatim@font{\normalfont\ttfamily}
+\begin{verbatim}
+\setlist{
+  topsep=     20pt <10-> 40pt         <-10> 6pt,
+  leftmargin=      <10-> 2cm <10> 1cm <-10> 0cm,
+  rightmargin=     <10-> 2cm <10> 1cm <-10> 0cm,
+  }
+\end{verbatim}
+\endgroup
 
 \section{Cloning the basic lists}
 \label{s.clone}
@@ -1200,8 +1255,8 @@ If for some reason you do not want to change |trivlist| and preserve
 the original definition, you can use the package option
 |ignoredisplayed|.
 
-If, on the other hand, you want to also apply the changes for all 
-lists to trivlists, just set the package option |includedisplayed|.
+\New{3.6} If, on the other hand, you want to also apply the changes for
+all lists to trivlists, just set the package option |includedisplayed|.
 
 \section{Samples}
 
@@ -1296,16 +1351,16 @@ noches, duelos y quebrantos los s\'{a}bados...
 
 With |\begin{enumerate}[labelindent=\parindent,|\allowbreak
 | leftmargin=*,|\allowbreak| label=\Roman*.,|\allowbreak
-| widest=IV,|\allowbreak| align=left]|.
+| widest=III,|\allowbreak| align=left]|.
 
-The rule shows \verb|labelindent|.
+The rule shows \verb|labelindent|. Note 
 
 \samplesep
 
 \showsep En un lugar de la Mancha, de cuyo nombre no quiero acordarme,
 no ha mucho tiempo que viv\'{\i}a un hidalgo de los de
 \begin{enumerate}[labelindent=\parindent, leftmargin=*,
-                  label=\Roman*., widest=IV, align=left]
+                  label=\Roman*., widest=III, align=left]
 \item lanza en astillero,
 \item adarna antigua,
 \item roc\'{\i}n flaco, y

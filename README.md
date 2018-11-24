@@ -1,4 +1,4 @@
-Enumitem 3.5.1466
+Enumitem 3.5.1470
 ~~~~~~~~~~~~~~
 
 A package to customize the three basic lists (enumerate,
@@ -100,7 +100,7 @@ behaved like resume.
 _________________________________________________________________
 Javier Bezos                    | http://www.tex-tipografia.com
 .................................................................
-2018/11/20
+2018/11/24
 
 
 

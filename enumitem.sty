@@ -10,7 +10,11 @@
 % ~~~~~~~
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{enumitem}[2018/11/20 v3.5.1466 Customized lists]
+\ProvidesPackage{enumitem}[2018/11/24 v3.5.1470 Customized lists]
+
+\PackageWarning{enumitem}%
+  {*** This is a development version ***\MessageBreak
+   ***   Don't use for production    ***}%
 
 % Notes
 % ~~~~~
@@ -238,19 +242,19 @@
 % ================
 
 \enitkv@key{enumitem}{topsep}{%
-  \setlength\topsep{#1}}
-  
+  \enit@setlength\topsep{#1}}
+
 % \enitkv@key{enumitem}{bottomsep}{%
   % \def\enit@bottomsep{#1}}
 
 \enitkv@key{enumitem}{itemsep}{%
-  \setlength\itemsep{#1}}
+  \enit@setlength\itemsep{#1}}
 
 \enitkv@key{enumitem}{parsep}{%
-  \setlength\parsep{#1}}
+  \enit@setlength\parsep{#1}}
 
 \enitkv@key{enumitem}{partopsep}{%
-  \setlength\partopsep{#1}}
+  \enit@setlength\partopsep{#1}}
 
 % Horizontal spacing
 % ==================
@@ -272,7 +276,7 @@
       \enit@calcwidestfalse
       \let\enit@calc\z@
     \fi
-    \setlength#1{#3}%
+    \enit@setlength#1{#3}%
   \fi\fi}
 
 \def\enitkv@enumitem@widest#1{%
@@ -295,7 +299,7 @@
   \ifnum\enit@calc=\z@
     \enit@calcwidestfalse
   \fi
-  \setlength\labelindent{#1}%
+  \enit@setlength\labelindent{#1}%
   \advance\labelindent\leftmargin}
 
 \enitkv@key{enumitem}{labelindent}{%
@@ -322,10 +326,10 @@
   \fi}
 
 \enitkv@key{enumitem}{listparindent}{%
-  \setlength\listparindent{#1}}
+  \enit@setlength\listparindent{#1}}
 
 \enitkv@key{enumitem}{rightmargin}{%
-  \setlength\rightmargin{#1}}
+  \enit@setlength\rightmargin{#1}}
 
 % labelsep, from itemindent; labelsep*, from leftmargin
 
@@ -335,12 +339,25 @@
     \enit@calcwidestfalse
     \let\enit@calc\z@
   \fi
-  \setlength\labelsep{#1}%
+  \enit@setlength\labelsep{#1}%
   \advance\labelsep\itemindent}
 
 \enitkv@key{enumitem}{labelsep}{%
   \enit@sepfrommarginfalse
   \enit@calcset\labelsep\tw@{#1}}
+  
+\enitkv@key{enumitem}{left}{%
+  \enit@setleft#1..\@empty..\@@}
+
+\def\enit@setleft#1..#2..#3\@@{%
+  \enit@setlength\labelindent{#1}%
+  \edef\enit@a{#3}%
+  \ifx\enit@a\@empty
+    \enit@calcset\leftmargin\thr@@*%
+  \else
+    \enit@setlength\leftmargin{#2}%
+    \enit@calcset\labelsep\tw@*%
+  \fi}
 
 % Series, resume and start
 % ========================
@@ -702,7 +719,7 @@
   \enit@align@left
   \leftmargin\z@
   \labelwidth\z@
-  \setlength\labelindent{#1}%
+  \enit@setlength\labelindent{#1}%
   \listparindent\labelindent
   \enit@calcset\itemindent\enit@iv!}
 
@@ -933,6 +950,77 @@
   \fi
   \expandafter\enit@setkeys@i\enit@savekeys\@@
   \let\enitkv@errx\enit@savekverr}
+  
+% Handling <> sytax for font sizes
+% ================================
+% The following code is based on LaTeX (\DeclareFontShape). Only the
+% code for <> is preserved (no functions), and a default value can be
+% set before the first <>. The original work is by the LaTeX Team,
+% under license LPPL.
+
+\def\enit@ifnot@nil#1{%
+  \def\enit@a{#1}%
+  \ifx\enit@a\@nnil
+    \expandafter\@gobble
+  \else
+    \expandafter\@firstofone
+  \fi}
+  
+\def\enit@remove@to@nnil#1\@nnil{}
+\def\enit@remove@angles#1>{\enit@simple@size}
+
+\def\enit@simple@size#1<{%
+  \if<#1<%
+    \expandafter\enit@remove@angles
+  \else
+    \def\enit@c{#1}%
+    \expandafter\enit@remove@to@nnil
+  \fi}
+    
+\def\enit@extractrange#1<#2>{%
+  \ifx\enit@c\relax
+    \def\enit@c{#1}%
+  \fi
+  \enit@isrange#2->\@nil#2>}
+
+\def\enit@isrange#1-#2\@nil{%
+   \if>#2%
+     \expandafter\enit@check@single
+   \else
+     \expandafter\enit@check@range
+   \fi}
+   
+\def\enit@check@range#1-#2>#3<#4\@nnil{%
+  \enit@ifnot@nil{#3}{%
+    \def\enit@b{\enit@extractrange<#4\@nnil}%
+    \upper@bound0#2\p@    %%% usar count@
+    \ifdim\upper@bound=\z@ \upper@bound\maxdimen \fi
+    \ifdim\f@size\p@<\upper@bound
+      \lower@bound0#1\p@
+      \ifdim\f@size\p@<\lower@bound
+      \else
+         \enit@simple@size#3<#4\@nnil
+      \fi
+    \fi
+    \enit@b}}
+    
+\def\enit@check@single#1>#2<#3\@nnil{%
+  \def\enit@b{\enit@extractrange<#3\@nnil}%
+  \ifdim\f@size\p@=#1\p@
+     \enit@simple@size#2<#3\@nnil
+  \fi
+  \enit@b}
+  
+\def\enit@try@size@range#1{%
+  \def\enit@a{#1}%
+  \let\enit@c\relax
+  \expandafter\enit@extractrange\enit@a <-*>\@nil<\@nnil}
+  
+\def\enit@setlength#1#2{%
+  \enit@try@size@range{#2}%  Returns \enit@c
+  \setlength#1{\enit@c}}
+  
+% This ends the code adapted from latex (under LPPL).
 
 % +=============================+
 % |         LIST TYPES          |
@@ -1324,9 +1412,9 @@
   \itemindent\z@
   \let\@itemlabel\@empty
   \def\makelabel##1{##1}}
-  
-% Let's recognize also the standard trivlists (except defined with)
-  
+
+% Let's recognize also the standard trivlists (except theorems)
+
 \let\enitdp@quote\@empty
 \let\enitdp@quotation\@empty
 \let\enitdp@verse\@empty
