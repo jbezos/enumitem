@@ -56,7 +56,7 @@
 suggestions go to \href{http://www.texnia.com/enumitem.html}%
 {\texttt{http://www.texnia.com/enumitem.html}}.}}
 
-\date{Version 3.5.1470\\2018/11/24}
+\date{Version 3.5.1471\\2018/11/25}
 
 \IfFileExists{enumitem.sty}{\usepackage{enumitem}}{}
 
@@ -76,32 +76,27 @@ suggestions go to \href{http://www.texnia.com/enumitem.html}%
 
 \section{Introduction}
 
+This package provides most of the flexibility you may want to
+design your own lists, with a |<key>=<value>| syntax:
 \begin{itemize}
-  \item A key/value interface.
-  \item Global settings.
-  \item An alternative way to set place the label, with a new 
-  parameter |labelindent|.
-  \item An enumerate-like syntax for setting the label format.
-  \item Define new lists.
+\item Fancy labels and fancy refs, including an \textsf{enumerate}-like 
+syntax.
+
+\item Alternative ways for positioning the label, with a new 
+  parameter (|labelindent|) and a tab-like setting (|left|).
+
+\item Settings applied globally or only in one of the three types or
+even in a single list (including |\topsep|).
+
+\item Inline lists, several description styles (which fix some bad
+spacing, too).
+
+\item trivlists properly formatted.
+
+\item Gathering of lists to be treated like a unit, as well as counter 
+resuming.
+
 \end{itemize}
-
-% When I began to use \LaTeX{} long ago, two particular points
-% annoyed me because I found customizing them was very complicated
-% ---headlines/footlines and lists.  A new way to redefine the former is
-% accomplished in my own \textsf{titleps} package, but none was
-% available to customize the latter except:
-% \begin{itemize}
-% \item \textsf{enumerate}, which just allows to change the label, and
-% it does it pretty well.
-
-% \item \textsf{mdwlist}, which only ``provides some vaguely useful
-% list-related commands and environments,'' as its manual states, and not
-% a consistent way of handling lists.
-
-% \item \textsf{paralist}, which provides lists within a paragraph (the
-% original purpose of that package), a few other hard-wired specific
-% changes, and the optional argument of \textsf{enumerate}.
-% \end{itemize}
 
 In the interface a sort of ``inheritance'' is used. You can set
 globally the behaviour of lists and then override several parameters
@@ -150,6 +145,48 @@ Horizontal spacing:
   (the manual is named |layman.pdf|).
 \end{note}
 
+\section{Quick reference}
+
+Some common settings. See the manual for details.
+
+\begin{itemize}
+\def\verbatim{\begin{shaded*}\bblxv}
+\def\endverbatim{\bblexv\vskip-1.6\baselineskip\end{shaded*}}
+
+\item To remove the vertical space altogether in a list:
+\begin{verbatim}
+\begin{enumerate}[nosep]
+\end{verbatim}
+
+\item To remove the vertical space altogether in \textit{all} lists:
+\begin{verbatim}
+\setlist{nosep}
+\end{verbatim}
+
+\item To start the label at the margin and the item text at the 
+  current parindent:
+\begin{verbatim}
+\begin{enumerate}[left=0pt .. \parindent]
+\end{verbatim}
+
+\item To configure the labels like in \textsf{enumerate}: include the
+package option |shortlabels| and then, as a first element, write your
+label:
+\begin{verbatim}
+\begin{enumerate}[(1)]
+\end{verbatim}
+
+\item To continue the previous list, after a ``pause'':
+\begin{verbatim}
+\begin{enumerate}[resume*]
+\end{verbatim}
+
+\item To use the three basic list in line: just add the package option 
+|inline| and then the environments |enumerate*|, |itemize*| and 
+|description*|.
+
+\end{itemize}
+
 \section{Keys}
 
 This section describes the keys in displayed lists. Most of them are
@@ -183,16 +220,6 @@ label is not to be computed or \verb|widest*| is used, see below).
 \end{verbatim}
 \end{example}
 
-\begin{example}
-  A fancier example
-  (which looks ugly, but it is intended only to illustrate what is
-  possible; requires \textsf{color} and \textsf{pifont}):
-\begin{verbatim}
-\begin{enumerate}[label=\protect\fcolorbox{blue}{yellow}{\protect\ding{\value*}},
-                  start=172]
-\end{verbatim}
-\end{example}
-
 \begin{warning}
   The value of |label| is a moving argument, and fragile commands must
   be protected \textit{except} the counters.  Because of that, use of
@@ -204,6 +231,15 @@ label is not to be computed or \verb|widest*| is used, see below).
   \verb|\AddEnumerateCounter|.\footnote{Which is admittedly somewhat
   convoluted.  A better way to accomplish this is on the way.}
 \end{warning}
+
+\begin{example}
+  A fancier example
+  (which looks ugly, but it is intended only to illustrate what is
+  possible; requires \textsf{color} and \textsf{pifont}):
+\begin{verbatim}
+\begin{enumerate}[label=\protect\fcolorbox{blue}{yellow}{\protect\ding{\value*}}]
+\end{verbatim}
+\end{example}
 
 \begin{desc}
 |label*=<commands>|
@@ -286,8 +322,8 @@ settings (see below):
 \begin{verbatim}
 \begin{enumerate}[label=\Roman*., align=left, leftmargin=*]
 \end{verbatim}
-(When the label box is supposed to have its natural width, use
-|left|.) 
+When the label box is supposed to have its natural width, use
+|left|.
 
 \begin{desc}
 |\SetLabelAlign{<value>}{<commands>}|
@@ -308,7 +344,7 @@ this, just add \verb|\null| at the end.
 
 \begin{example}
   Although primarily intended for the alignment, this commands has other
-  uses (as in the provided \verb|parleft|).  For example, with the
+  uses (an example is the provided \verb|parleft|).  For example, with the
   following all labels with |align=right| are set as superscripts:
 \begin{verbatim}
 \SetLabelAlign{right}{\hss\llap{\textsuperscript{#1}}}
@@ -352,17 +388,18 @@ takes a negative value.
 \begin{note}
   Since |\parindent| is not used as such inside lists, but instead
   is set internally to either |\itemindent| or |\listparindent|,
-  when used as the value of a parameter \textsf{enumitem} it returns
+  when used as the value of a parameter \textsf{enumitem} returns
   the global value, i. e., the value it has outside the outermost 
   list. 
 \end{note}
 
 \begin{note}
-  If you find these parameters baffling, you are not alone. You can
-  visualize them by writing |\DrawEnumitemLabel| just before the first
-  item, which draw 4 rules -- from top to bottom, |leftmargin| (thin),
-  |labelindent| (thick if positive, thin if negative), |labelwidth|
-  (thick) and |labelsep| (thick). If 0, a rule is not shown.
+\New{3.6} If you find these parameters baffling, you are not alone. You
+can visualize them by writing |\DrawEnumitemLabel| just before the
+first item (or in |first|), which draws 4 rules from top to bottom,
+|leftmargin| (thin), |labelindent| (thick if positive, thin if
+negative), |labelwidth| (thick) and |labelsep| (thick). If 0, a rule is
+not shown.
 \end{note}
 
 \begin{desc}
@@ -377,7 +414,8 @@ depends on the others, i.e., it has to be computed from the other
 values, as described below. By default, the computed value is
 |labelindent|, even if explicitly set with some value (it defaults to
 0~pt). So, if you are setting it to some value, very likely you want to
-set some other parameter to |!| or |*|, because otherwise it is no-op.
+set some other parameter to |!| or |*|, because otherwise it is 
+ignored.
 
 There is a new counter length |\labelindent|.
 
@@ -394,9 +432,9 @@ The five parameteres are related in the following way:
 
 \New{3.6} This is a convenience key to set quickly the most common
 layouts for the label. You may regard it as a sort or ``rule'' with two
-tab stops: the start of the label and the start of the text. With only
-|<labelindent>|, the left margin (the ``start of text'') is computed
-with the |labelsep|.
+tab stops: the start of the label and the start of the text (both with
+relation to the normal side margin). With only |<labelindent>|, the
+left margin (the ``start of text'') is computed with the |labelsep|.
 
 \begin{example}
   Typical settings would be:
@@ -413,6 +451,12 @@ with the |labelsep|.
   The label width is set to the default widest one. If there are lists
   with Arabic numerals $\ge 10$, you may want to set |widest|, too.
 \end{note}
+
+\begin{note}
+|left=<labelindent>| sets |leftmargin=*|;
+|left=<labelindent> .. <leftmargin>| sets |labelsep=*|.
+\end{note}
+
 
 \begin{desc}
 |leftmargin=!|\qquad|itemindent=!|\qquad|labelsep=!|
@@ -491,6 +535,8 @@ built using |<integer>| as the value of the counter (e.g., with
 Since |\value| does not return a string but a number, |widest| and the
 \verb|*| values cannot be used with it. However, with \verb|widest*|,
 being a number, it is allowed.
+
+\New{3.6} It can be used with |itemize| and |description|, too.
 
 \begin{desc}
 \verb|labelsep*=<length>|
@@ -707,6 +753,21 @@ and you can access and manipulate the list parameters.
 
 Same, but just before the list ends.
 
+\begin{desc}
+|first=<code>|\qquad|first*=<code>|
+\end{desc}
+
+Same, but as the very first thing in the list body, so that
+\begin{verbatim}
+\begin{itemize}[first=<code>]
+\end{verbatim}
+is the same as
+\begin{verbatim}
+\begin{itemize}
+<code>
+\end{verbatim}
+With it you may insert, for example, an |\item|.
+
 \subsection{Description styles}
 
 A key available in |description|.
@@ -716,35 +777,40 @@ A key available in |description|.
 
 Sets the description \textit{style}. |<name>| can be any of the 
 following:
-\begin{itemize}
-\item |standard|: like |description| in standard classes, although
+\begin{description}
+\item[|standard|] Like |description| in standard classes, although
 with other classes it could be somewhat different.  The label is
 boxed.  Sets \verb|itemindent=!|.
 
-\item |unboxed|: much like the standard |description|, but 
+\item[|unboxed|] Much like the standard |description|, but 
 the label is not boxed to avoid uneven spacing and unbroken labels if 
 they are long. Sets \verb|itemindent=!|.
 
-\item |nextline|: if the label does not fit in the margin, the text
+\item [|nextline|] If the label does not fit in the margin, the text
 continues in the next line, otherwise it is placed in a box of width
 |\leftmargin| $-$ |\labelsep|, i.e., the item body never sticks into
 the left margin.  Sets \verb|labelwidth=!|.
 
-\item |sameline|: like |nextline| but if the label does not 
+\item[|sameline|] Like |nextline| but if the label does not 
 fit in the margin the text continues in the same line. Same as
 \verb|style=unboxed,labelwidth=!|.
 
-\item |multiline|: the label is placed in a parbox whose width is 
+\item[|multiline|] The label is placed in a parbox whose width is 
 |leftmargin|, with several lines if 
 necessary. Same as \verb|style=standard,align=parleft,labelwidth=!|.
 
-Three caveats: (1) mixing boxed and unboxed labels has not a
-well-defined behaviour, (2) when nesting list all combinations are
-allowed but not all make sense, and (3) nesting \verb|nextline| lists
-is not supported (it works, but its behaviour might change in the
-future, because the current one is not what one could expect).
+\end{description}
 
-\end{itemize}
+\begin{warning}
+\begin{enumerate}
+\item Mixing boxed and unboxed labels has not a well-defined behaviour.
+\item When nesting list all combinations are allowed but not all make
+  sense.
+\item Nesting \verb|nextline| lists is not supported (it works, but its
+  behaviour might change in the future, because the current one is not
+  what one could expect).
+\end{enumerate}
+\end{warning}
 
 \subsection{Compact lists}
 
@@ -1043,24 +1109,50 @@ This allows defining lists with the help of loops.
   zero'' is raised.
 \end{warning}
 
-Currently, a way to discriminate the font size is not provided
-(|\normalsize|, |\small|\dots).\New{3.6} WORK IN PROGRESS: lengths can
+\section{Size dependent settings}
+
+\New{3.6} The following package option is requrired for making use of
+this feature.
+
+\begin{desc}
+|sizes| (package option)
+\end{desc}
+
+WORK IN PROGRESS: Lengths can
 contain size-based settings as follows (the value before the first $<$ 
-is a default). Best top to bottom, because ``last wins''? Or change it
-to ``first wins''? TODO -- name based settings (remember [11pt] is
-10.95), an alternative
-|\setlist<size>|.
+is a default). TODO -- An alternative |\setlist<size>|.
 \begingroup
 \makeatletter
 \renewcommand\verbatim@font{\normalfont\ttfamily}
 \begin{verbatim}
 \setlist{
-  topsep=     20pt <10-> 40pt         <-10> 6pt,
-  leftmargin=      <10-> 2cm <10> 1cm <-10> 0cm,
-  rightmargin=     <10-> 2cm <10> 1cm <-10> 0cm,
+  topsep=     20pt <-10> 6pt          <10-> 40pt,
+  leftmargin=      <-10> 0cm <10> 1cm <10-> 2cm ,
+  rightmargin=     <-10> 0cm <10> 1cm <10-> 2cm ,
   }
 \end{verbatim}
 \endgroup
+
+Names are accepted, too: script, tiny, footnote, small, normal, large, Large, LARGE,
+huge, Huge (ie, remove `size'). TODO - |\SetEnumitemSizes| to
+configure it.
+\begingroup
+\makeatletter
+\renewcommand\verbatim@font{\normalfont\ttfamily}
+\begin{verbatim}
+\setlist{
+  topsep=     20pt <-normal> 6pt              <normal-> 40pt,
+  leftmargin=      <-normal> 0cm <normal> 1cm <normal-> 2cm ,
+  rightmargin=     <-normal> 0cm <normal> 1cm <normal-> 2cm ,
+  }
+\end{verbatim}
+\endgroup
+
+Single values take precedence over ranges. In ranges, the last match
+wins. The range |a-b| is $a \le \mbox{size} < b$. These rules allow
+the setting for 10 or |normal| in the logical place, as shown above.
+Remember nominal sizes are not always the real sizes -- for example,
+with option |11pt|, |\normalsize| (and |normal|) is 10.95.
 
 \section{Cloning the basic lists}
 \label{s.clone}
@@ -1262,8 +1354,7 @@ all lists to trivlists, just set the package option |includedisplayed|.
 
 \expandafter\ifx\csname setenumerate\endcsname\relax
 
-Please, install first the package and then typeset this
-document again.
+Please, install first the package and then typeset this document again.
 
 \else
 

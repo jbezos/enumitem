@@ -1,5 +1,24 @@
-Enumitem 3.5.1470
+Enumitem 3.5.1471
 ~~~~~~~~~~~~~~
+
+***** This is a development version. *****
+
+New:
+
+Featured:
+
+- New key 'left', for fast, tab-like positioning of the label
+- The key 'widest' now works with 'itemize' and 'description'
+
+Also:
+
+- New key 'first', for code at the beginning of the list body
+- \DrawEnumitemLabel, for visual debugging of the label position
+- Extended settings for trivlist, with a new package option 
+  includedisplayed
+- Size dependent lengths
+
+-----------------------
 
 A package to customize the three basic lists (enumerate,
 itemize and description) by means of a set of parameters,
@@ -100,7 +119,7 @@ behaved like resume.
 _________________________________________________________________
 Javier Bezos                    | http://www.tex-tipografia.com
 .................................................................
-2018/11/24
+2018/11/25
 
 
 

@@ -10,7 +10,7 @@
 % ~~~~~~~
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{enumitem}[2018/11/24 v3.5.1470 Customized lists]
+\ProvidesPackage{enumitem}[2018/11/25 v3.5.1471 Customized lists]
 
 \PackageWarning{enumitem}%
   {*** This is a development version ***\MessageBreak
@@ -283,6 +283,16 @@
   \expandafter\let\csname enit@cw@\@enumctr\endcsname\relax
   \@namedef{enit@widest@\@enumctr}##1{#1}}
 
+  %%%% FIX - bug? format was not taken into account
+
+\def\enitkv@enumitem@widest#1{%
+  \ifcase\enit@type  % enumerate
+    \expandafter\let\csname enit@cw@\@enumctr\endcsname\relax
+    \@namedef{enit@widest@\@enumctr}##1{\enit@format{#1}}%
+  \else              % itemize / description
+    \def\enit@widest@{\enit@format{#1}}%
+  \fi}
+
 \def\enitkv@enumitem@widest@default{%
   \expandafter\let\csname enit@cw@\@enumctr\endcsname\relax
   \expandafter\let\csname enit@widest@\@enumctr\endcsname\relax}
@@ -345,7 +355,7 @@
 \enitkv@key{enumitem}{labelsep}{%
   \enit@sepfrommarginfalse
   \enit@calcset\labelsep\tw@{#1}}
-  
+
 \enitkv@key{enumitem}{left}{%
   \enit@setleft#1..\@empty..\@@}
 
@@ -685,16 +695,23 @@
 \enitkv@key{enumitem}{before}{%
   \def\enit@before{#1}}
 
-\enitkv@key{enumitem}{after}{%
-  \def\enit@after{#1}}
-
 \enitkv@key{enumitem}{before*}{%
   \expandafter\def\expandafter\enit@before\expandafter
     {\enit@before#1}}
 
+\enitkv@key{enumitem}{after}{%
+  \def\enit@after{#1}}
+
 \enitkv@key{enumitem}{after*}{%
   \expandafter\def\expandafter\enit@after\expandafter
     {\enit@after#1}}
+    
+\enitkv@key{enumitem}{first}{%
+  \def\enit@first{#1}}
+
+\enitkv@key{enumitem}{first*}{%
+  \expandafter\def\expandafter\enit@first\expandafter
+    {\enit@first#1}}
 
 % Miscelaneous keys
 % ================
@@ -807,7 +824,7 @@
 
 \def\enit@calcwidth{%
   \ifenit@calcwidest
-    \ifnum\enit@type=\z@ % ie, enum
+    \ifcase\enit@type% ie, enum
       \enit@ifunset{enit@cw@\@enumctr}%
         {\@namedef{enit@cv@\@enumctr}{\enit@valueerror\@enumctr}}%
         {\edef\enit@values{%
@@ -816,16 +833,29 @@
          \expandafter
          \edef\csname enit@cv@\@enumctr\endcsname
            {\@nameuse{c@\@enumctr}}}%
+      \begingroup
+        \enit@values
+        \def\value##1{\csname enit@cv@##1\endcsname}%
+        \let\enit@elt\enit@getwidth
+        \enit@labellist
+        \settowidth\labelwidth{\@itemlabel}%
+        \xdef\enit@a{\labelwidth\the\labelwidth\relax}%
+      \endgroup
+      \enit@a
+    \or
+      \ifx\enit@widest@\relax
+        \settowidth\labelwidth{\@itemlabel}%
+      \else
+        \settowidth\labelwidth{\enit@widest@}%
+      \fi
+    \else
+      \ifx\enit@widest@\relax
+        \settowidth\labelwidth{\@itemlabel}%
+      \else
+        \settowidth\labelwidth{\makelabel{\enit@widest@}}%
+      \fi
+      \advance\labelwidth-\labelsep
     \fi
-    \begingroup
-      \enit@values
-      \def\value##1{\csname enit@cv@##1\endcsname}%
-      \let\enit@elt\enit@getwidth
-      \enit@labellist
-      \settowidth\labelwidth{\@itemlabel}%
-      \xdef\enit@a{\labelwidth\the\labelwidth\relax}%
-    \endgroup
-    \enit@a
   \fi
   \advance\dimen@-\labelwidth}
 
@@ -890,6 +920,7 @@
 \def\enit@preset#1#2#3{%
    \enit@sepfrommarginfalse
    \enit@calcwidestfalse
+   \let\enit@widest@\relax
    \let\enit@resuming\z@
    \let\enit@series\relax
    \enit@boxmodetrue
@@ -898,6 +929,7 @@
    \let\enit@afterlabel\nobreakspace
    \let\enit@before\@empty
    \let\enit@after\@empty
+   \let\enit@first\@empty
    \let\enit@format\@firstofone % and NOT empty
    \let\enit@ref\relax
    \labelindent\z@skip
@@ -923,7 +955,7 @@
 
 % keyval "error" in the optional argument: all undefined keys are
 % passed to the keyval error, but <series> is ignored (already
-% processed in enumitem-resume
+% processed in enumitem-resume)
 
 \def\enitkv@err@b#1{%
    \enit@ifunset{enit@resumekeys@series@\@tempa}%
@@ -950,7 +982,7 @@
   \fi
   \expandafter\enit@setkeys@i\enit@savekeys\@@
   \let\enitkv@errx\enit@savekverr}
-  
+
 % Handling <> sytax for font sizes
 % ================================
 % The following code is based on LaTeX (\DeclareFontShape). Only the
@@ -965,7 +997,7 @@
   \else
     \expandafter\@firstofone
   \fi}
-  
+
 \def\enit@remove@to@nnil#1\@nnil{}
 \def\enit@remove@angles#1>{\enit@simple@size}
 
@@ -976,7 +1008,7 @@
     \def\enit@c{#1}%
     \expandafter\enit@remove@to@nnil
   \fi}
-    
+
 \def\enit@extractrange#1<#2>{%
   \ifx\enit@c\relax
     \def\enit@c{#1}%
@@ -989,38 +1021,63 @@
    \else
      \expandafter\enit@check@range
    \fi}
-   
+
 \def\enit@check@range#1-#2>#3<#4\@nnil{%
   \enit@ifnot@nil{#3}{%
     \def\enit@b{\enit@extractrange<#4\@nnil}%
-    \upper@bound0#2\p@    %%% usar count@
+    \upper@bound=%
+      \enit@ifunset{enit@sizefor@#2}{0#2\p@}{\@nameuse{enit@sizefor@#2}\p@}%
+          %%% usar count@
     \ifdim\upper@bound=\z@ \upper@bound\maxdimen \fi
     \ifdim\f@size\p@<\upper@bound
-      \lower@bound0#1\p@
+      \lower@bound=%
+      \enit@ifunset{enit@sizefor@#1}{0#1\p@}{\@nameuse{enit@sizefor@#1}\p@}%
       \ifdim\f@size\p@<\lower@bound
       \else
          \enit@simple@size#3<#4\@nnil
       \fi
     \fi
     \enit@b}}
-    
+
 \def\enit@check@single#1>#2<#3\@nnil{%
   \def\enit@b{\enit@extractrange<#3\@nnil}%
-  \ifdim\f@size\p@=#1\p@
+  \ifdim\f@size\p@=
+     \enit@ifunset{enit@sizefor@#1}{0#1\p@}{\@nameuse{enit@sizefor@#1}\p@}%
      \enit@simple@size#2<#3\@nnil
+     \let\enit@d\enit@c    %%%%% is this correct ???
   \fi
   \enit@b}
-  
+
 \def\enit@try@size@range#1{%
   \def\enit@a{#1}%
-  \let\enit@c\relax
+  \let\enit@c\relax  % last in range
+  \let\enit@d\relax  % single
   \expandafter\enit@extractrange\enit@a <-*>\@nil<\@nnil}
   
-\def\enit@setlength#1#2{%
-  \enit@try@size@range{#2}%  Returns \enit@c
-  \setlength#1{\enit@c}}
-  
+% \enit@setlength is defined in the options section
+
+% \def\enit@setlength#1#2{%
+%   \enit@try@size@range{#2}%  Returns \enit@c and or enit@d
+%   \ifx\enit@d\relax\else\let\enit@c\enit@d\fi
+%   \setlength#1{\enit@c}}
+
 % This ends the code adapted from latex (under LPPL).
+
+\def\enit@getsizefor#1#2{%
+  {\let\selectfont\relax
+   #2%
+   \expandafter\xdef\csname enit@sizefor@#1\endcsname{\f@size}}}   
+
+\enit@getsizefor{script}\scriptsize
+\enit@getsizefor{tiny}\tiny
+\enit@getsizefor{footnote}\footnotesize
+\enit@getsizefor{small}\small
+\enit@getsizefor{normal}\normalsize
+\enit@getsizefor{large}\large
+\enit@getsizefor{Large}\Large
+\enit@getsizefor{LARGE}\LARGE
+\enit@getsizefor{huge}\huge
+\enit@getsizefor{Huge}\Huge   
 
 % +=============================+
 % |         LIST TYPES          |
@@ -1307,6 +1364,7 @@
        \enit@ref
        \enit@calcleft
        \enit@before}%
+    \enit@first
   \fi}
 
 \let\enit@endenumerate\enit@endlist
@@ -1342,6 +1400,7 @@
         \enit@preset{#2}{#1}{#4}% 
         \enit@calcleft
         \enit@before}%
+    \enit@first
   \fi}
 
 \let\enit@enditemize\enit@endlist
@@ -1388,6 +1447,7 @@
            \aftergroup\enit@postlabel
          \fi}%
        \enit@before}%
+     \enit@first
   \fi}
 
 \let\enit@enddescription\enit@endlist
@@ -1678,6 +1738,13 @@
    \newenvironment{description*}[1][]%
      {\@nameuse{enit@description*}\enitdp@description{description}\@M{#1}}
      {\@nameuse{enit@enddescription*}}}
+
+\let\enit@setlength\setlength
+\DeclareOption{sizes}     
+  {\def\enit@setlength#1#2{%
+     \enit@try@size@range{#2}%  Returns \enit@c and or enit@d
+     \ifx\enit@d\relax\else\let\enit@c\enit@d\fi
+     \setlength#1{\enit@c}}}
 
 \let\enit@shl\enit@toks
 
