@@ -1,125 +1,30 @@
-Enumitem 3.5.1471
-~~~~~~~~~~~~~~
+## Enumitem 3.6
 
-***** This is a development version. *****
+This package provides most of the flexibility you may want to customize
+the three basic list environments (`enumerate`, `itemize` and
+`description`) and to design your own lists, with a `<key>=<value>`
+syntax.
 
-New:
+### Latest changes
 
-Featured:
+```
+3.6  2018-11-30
+   - New key 'left', for fast, tab-like positioning of the label.
+   - The key 'widest' now works with 'itemize' and 'description'.
+   - New key 'first', for code at the beginning of the list body.
+   - \DrawEnumitemLabel, for visual debugging of the label position.
+   - Extended settings for trivlist, with a new package option 
+     'includedisplayed'.
+   - Size dependent lengths (first steps).
+   - Fix - 'format'/'font' was not taken into account when computing 
+     'widest'.
+```
 
-- New key 'left', for fast, tab-like positioning of the label
-- The key 'widest' now works with 'itemize' and 'description'
+License:     MIT
 
-Also:
+Repository:  https://github.com/jbezos/enumitem
 
-- New key 'first', for code at the beginning of the list body
-- \DrawEnumitemLabel, for visual debugging of the label position
-- Extended settings for trivlist, with a new package option 
-  includedisplayed
-- Size dependent lengths
+________
+Javier Bezos --- http://www.texnia.com
 
------------------------
-
-A package to customize the three basic lists (enumerate,
-itemize and description) by means of a set of parameters,
-and to clone them to define new "logical" lists.
-It provides most of the flexibility you may want to
-design your own lists:
-- fancy labels and fancy refs,
-- leftmargin, labelsep and labelwidth automatically set,
-- changes applied globally or only in one of the three
-  types or even in a single list (including topsep) by
-  means of a sort of "inheritance",
-- inline lists,
-- several description styles (which fix some bad
-  spacing, too),
-- starting value and counter resuming,
-- trivlists properly formatted,
-- control on page breaking,
-- gathering of lists to be treated like a unit.
-
-Recent changes (3.0)
-~~~~~~~~~~~~~~~~~~~~
-
-1) Inline lists, with keys to set how items are joined (ie, the
-punctuation between items).  Two modes are provided: `boxed' an
-`unboxed' -- with the former (the default) a different punctuation
-before the last item is allowed.
-2) \setlist is calc-savvy (eg, for use in loops), and you can set
-diferent lists and levels at once.
-3) All lengths related to labels can take the value * (and not only
-labelsep and leftmargin).  Its behaviour has been made consistent and
-there is new value !  which does not compute the widest label.
-4) With \restartlist{list-name}, list counters can be restarted (in
-case you are using `resume').
-5) `resume*' can be combined with other keys.
-6) Lists can be gathered globally using series, so that they are
-considered a single list.  To start a series just use
-series=<series-name> and then resume it with resume=<series-name> or
-resume*=<series-name>.
-7) The ``experimental'' fullwidth has been replaced by a new key
-`wide'.
-8) \SetLabelAlign defines new align values.
-9) You can define ``abstract'' values (eg, label=numeric) and
-new keys.
-
-Bug fixes (3.0)
-~~~~~~~~~~~~~~~
-
-- Star values (eg, leftmargin=*) could not be overriden
-and new values were ignored.
-- nolistsep as the first of several keys was not always
-recognized and therefore treated like a short label
-(ie, nol\roman*stsep).
-- labelwidth didn't always work (when there was a prior
-`widest' and *)
-- With align=right the label and the following text could
-overlap.
-- description didn't get the correct list level.
-- At some point (2.x?) \value* stopped working.
-
-3.1
-~~~
-- Fixed incompatibility with xkeyval
-
-3.2
-~~~
-- start and widest* are calc-savvy.
-- \value can be used with widest*
-- Some internal restrictions in \arabic and the like has been removed.
-It is more flexible at the cost of having a more ``relaxed'' error
-checking.
-
-3.3
-~~~
-- Using *-values with itemize and description didn't work.
-
-3.4
-~~~
-- New key nosep, replacing nolistsep, which didn't work as
-documented.
-- Fixed spacing in inline boxed lists.
-- Fixed (hopefully) the bug with noitemsep and shorlabels.
-
-3.5.0
-~~~~~
-- Fixed the fix related to inline lists (spacefactor).
-- Fixed some problems in nested boxed inline lists.
-(- And sub-sub-versions are introduced.)
-
-3.5.1
-~~~~~
-- resume* only worked once, and subsequent ones
-behaved like resume.
-
-3.5.2
-~~~~~
-- \setlist* didn't work.
-
-_________________________________________________________________
-Javier Bezos                    | http://www.tex-tipografia.com
-.................................................................
-2018/11/25
-
-
-
+2018/11/30

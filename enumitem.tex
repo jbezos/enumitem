@@ -56,7 +56,7 @@
 suggestions go to \href{http://www.texnia.com/enumitem.html}%
 {\texttt{http://www.texnia.com/enumitem.html}}.}}
 
-\date{Version 3.5.1471\\2018/11/25}
+\date{Version 3.6\\2018/11/30}
 
 \IfFileExists{enumitem.sty}{\usepackage{enumitem}}{}
 
@@ -76,11 +76,13 @@ suggestions go to \href{http://www.texnia.com/enumitem.html}%
 
 \section{Introduction}
 
-This package provides most of the flexibility you may want to
-design your own lists, with a |<key>=<value>| syntax:
+This package provides most of the flexibility you may want to customize
+the three basic list environments (|enumerate|, |itemize| and
+|description|) and to design your own lists, with a |<key>=<value>|
+syntax:
 \begin{itemize}
-\item Fancy labels and fancy refs, including an \textsf{enumerate}-like 
-syntax.
+\item Fancy labels and fancy refs, including a syntax similar to that 
+in the \textsf{enumerate} package.
 
 \item Alternative ways for positioning the label, with a new 
   parameter (|labelindent|) and a tab-like setting (|left|).
@@ -88,10 +90,11 @@ syntax.
 \item Settings applied globally or only in one of the three types or
 even in a single list (including |\topsep|).
 
-\item Inline lists, several description styles (which fix some bad
-spacing, too).
+\item Inline lists.
 
-\item trivlists properly formatted.
+\item Several description styles (which fix some bad spacing, too).
+
+\item |trivlist|s properly formatted.
 
 \item Gathering of lists to be treated like a unit, as well as counter 
 resuming.
@@ -100,22 +103,19 @@ resuming.
 
 In the interface a sort of ``inheritance'' is used. You can set
 globally the behaviour of lists and then override several parameters
-of, say, enumerate and then in turn override a few paremeters of a
+of, say, |enumerate| and then in turn override a few paremeters of a
 particular instance. The values will be searched in the hierarchy.
 
-\section{The package}
-
-This package is intended to ease customizing the three basic list
-environments: |enumerate|, |itemize| and |description|. It extends
-their syntax to allow an optional argument where a set of parameters in
-the form |key=value| are available. These keys are equivalent to the
-well known list parameters -- please, see a \LaTeX{} manual for a
-description of them. Next sections explains the extensions provided by
-|enumitem|.
+The package extends the syntax of the lists to allow an optional
+argument where a set of parameters in the form |key=value| are
+available. These keys are equivalent to the well known list parameters
+-- please, see a \LaTeX{} manual for a description of them. Next
+sections explains the extensions provided by |enumitem|.
 \begin{itemize}
 \item
 Vertical spacing:
 \begin{itemize}
+\setlength{\itemsep}{0pt}
 \item |topsep|
 \item |partopsep|
 \item |parsep|
@@ -124,6 +124,7 @@ Vertical spacing:
 \item
 Horizontal spacing:
 \begin{itemize}
+\setlength{\itemsep}{0pt}
 \item |leftmargin|
 \item |rightmargin|
 \item |listparindent|
@@ -147,7 +148,7 @@ Horizontal spacing:
 
 \section{Quick reference}
 
-Some common settings. See the manual for details.
+Some common settings. See the manual below for details.
 
 \begin{itemize}
 \def\verbatim{\begin{shaded*}\bblxv}
@@ -205,7 +206,7 @@ argument stand for the current counter in
 |enumerate|.\footnote{Actually, the asterisk is currently the argument
 but things may change. Consider them as starred variants and follow the
 corresponding syntax.} It works with |\value|, too (provided the widest
-label is not to be computed or \verb|widest*| is used, see below).
+label is not to be computed or |widest*| is used, see below).
 
 \begin{note}
   If you prefer setting labels like the \textsf{enumerate} package, use 
@@ -223,12 +224,12 @@ label is not to be computed or \verb|widest*| is used, see below).
 \begin{warning}
   The value of |label| is a moving argument, and fragile commands must
   be protected \textit{except} the counters.  Because of that, use of
-  \verb|\value| is somewhat tricky, because \verb|\the| or \verb|\ifnum|
-  expects an actual value, which is not the case when \verb|label| is
-  being processed to replace internally the \verb|*| by the form with
+  |\value| is somewhat tricky, because |\the| or |\ifnum|
+  expects an actual value, which is not the case when |label| is
+  being processed to replace internally the |*| by the form with
   the counter argument.  The best solution is usually encapsulating the
   logic inside a new ``counter'' with the help of
-  \verb|\AddEnumerateCounter|.\footnote{Which is admittedly somewhat
+  |\AddEnumerateCounter|.\footnote{Which is admittedly somewhat
   convoluted.  A better way to accomplish this is on the way.}
 \end{warning}
 
@@ -258,7 +259,7 @@ on):
 \end{desc}
 
 By default, |label| sets also the form of cross references and
-|\the...| (overriding the settings in previous hierarchical
+|\the...| (overriding the settings in parent hierarchical
 levels), but you can define a different format with this key.  For
 example, to remove the right parethesis:
 \begin{verbatim}
@@ -277,22 +278,24 @@ example, to remove the right parethesis:
 \end{verbatim}  
 \end{note}
 
-Note the |label|s are \textit{not} accumulated to form the reference.
-If you want, say, something like 1.\textit{a} from 1) as first level
-and \textit{a}) as second level, you must set it with |ref|. You may
-use |\ref{level1}.\ref{level2}| with appropiate |ref| settings, but as
-Robin Fairbairns points out in the \TeX{} FAQ:
-\begin{quote}
-\dots{} [that] would be both tedious and error-prone. What is more, it 
-would be undesirable, since you would be constructing a visual 
-representation which is inflexible (you could not change all the 
-references to elements of a list at one fell swoop).
-\end{quote}
-This is sensible and I recommend to follow the advice, but sometimes
-you might want something like:
+\begin{note}
+  The |label|s are \textit{not} accumulated to form the reference.
+  If you want, say, something like 1.\textit{a} from 1) as first level
+  and \textit{a}) as second level, you must set it with |ref|. You may
+  use |\ref{level1}.\ref{level2}| with appropiate |ref| settings, but as
+  Robin Fairbairns points out in the \TeX{} FAQ:
+  \begin{quote}
+  \dots{} [that] would be both tedious and error-prone. What is more, it 
+  would be undesirable, since you would be constructing a visual 
+  representation which is inflexible (you could not change all the 
+  references to elements of a list at one fell swoop).
+  \end{quote}
+  This is sensible and I recommend to follow the advice, but sometimes
+  you might want something like:
 \begin{verbatim}
 ... subitem \ref{level2} of item \ref{level1} ...
 \end{verbatim}
+\end{note}
 
 \begin{warning}
   The value of |ref| is a moving argument, and fragile commands must be
@@ -300,14 +303,14 @@ you might want something like:
 \end{warning}
 
 \begin{desc}
-|font=<commands>|\qquad\verb|format=<commands>|
+|font=<commands>|\qquad|format=<commands>|
 \end{desc}
 
 Sets the label font.  Useful when the label is changed with the
 optional argument of |\item| and in \texttt{description}.  The last
 command in |<commands>| can take an argument with the item label.  In
 \texttt{description} class setting are in force, so you may want begin
-with \verb|\normalfont|. A synonymous is \texttt{format}.
+with |\normalfont|. A synonymous is \texttt{format}.
 
 \begin{desc}
 |align=left|\qquad |align=right|\qquad |align=parleft|
@@ -315,7 +318,7 @@ with \verb|\normalfont|. A synonymous is \texttt{format}.
 
 How the label is aligned (with relation to the label box edges).
 Three values are possible: |left|, the default |right| and
-\verb|parleft| (a parbox of width \verb|\labelwidth| with flush left
+|parleft| (a parbox of width |\labelwidth| with flush left
 text).  The parameters controlling the label spacing should be
 properly set, either by hand or more conveniently with the |*|
 settings (see below):
@@ -338,13 +341,9 @@ to:
 \SetLabelAlign{parleft}{\strut\smash{\parbox[t]\labelwidth{\raggedright##1}}}
 \end{verbatim}
 
-If the last thing in the definition is a skip (typically \verb|\hfil|), it is
-removed sometimes by description. If for some reason you want to avoid
-this, just add \verb|\null| at the end.
-
 \begin{example}
   Although primarily intended for the alignment, this commands has other
-  uses (an example is the provided \verb|parleft|).  For example, with the
+  uses (an example is the provided |parleft|).  For example, with the
   following all labels with |align=right| are set as superscripts:
 \begin{verbatim}
 \SetLabelAlign{right}{\hss\llap{\textsuperscript{#1}}}
@@ -353,13 +352,19 @@ this, just add \verb|\null| at the end.
 \end{example}
 
 \begin{note}
+  If the last thing in the definition is a skip (typically |\hfil|), it is
+  removed sometimes by |description|. If for some reason you want to avoid
+  this, just add |\null| at the end.
+\end{note}
+
+\begin{note}
   If you want the internal settings for \texttt{align} and \texttt{font}
   be ignored, you can override the \textsf{enumitem} definition of
-  \verb|\makelabel| in \texttt{before}:
+  |\makelabel| in \texttt{before}:
 \begin{verbatim}
 \begin{description}[before={\renewcommand\makelabel[1]{\ref{##1}}}]
 \end{verbatim}
-  Alternatively, define a macro and use \verb|\let|.
+  Alternatively, define a macro and use |\let|.
 \end{note}
 
 \subsection{Horizontal spacing of labels}
@@ -404,7 +409,7 @@ not shown.
 
 \begin{desc}
 |labelindent=<length>|\\
-\verb|\labelindent|
+|\labelindent|
 \end{desc}
 
 This parameter is added in \textsf{enumitem} for the blank space from
@@ -421,13 +426,13 @@ There is a new counter length |\labelindent|.
 
 The five parameteres are related in the following way:
 \[
-\verb|\leftmargin|+\verb|\itemindent| = 
-\verb|\labelindent|+\verb|\labelwidth|+\verb|\labelsep|
+|\leftmargin|+|\itemindent| = 
+|\labelindent|+|\labelwidth|+|\labelsep|
 \]
 
 \begin{desc}
 |left=<labelindent>|\\
-\verb|left=<labelindent> .. <leftmargin>|
+|left=<labelindent> .. <leftmargin>|
 \end{desc}
 
 \New{3.6} This is a convenience key to set quickly the most common
@@ -457,15 +462,14 @@ left margin (the ``start of text'') is computed with the |labelsep|.
 |left=<labelindent> .. <leftmargin>| sets |labelsep=*|.
 \end{note}
 
-
 \begin{desc}
 |leftmargin=!|\qquad|itemindent=!|\qquad|labelsep=!|
 \qquad|labelwidth=!|\qquad|labelindent=!|
 \end{desc}
 
 Sets which value is to be computed from the others. The default is
-|labelindent=!|, but note some keys set another value (\verb|wide| and
-description \verb|style|s). Computations are done after \textit{all}
+|labelindent=!|, but note some keys set another value (|wide| and
+description |style|s). Computations are done after \textit{all}
 keys has been read. Explicit values are not lost, and so with the
 following hierarchical settings: \begin{verbatim}
 leftmargin=2em
@@ -514,7 +518,9 @@ always the same within a list, of course).
 \end{verbatim}
 \end{note}
 
-|labelwidth=*| and |labelwidth=!| are synonymous.
+\begin{note}
+  |labelwidth=*| and |labelwidth=!| are synonymous.
+\end{note}
 
 \begin{desc}
 |widest=<string>|\qquad|widest*=<integer>|\qquad|widest|
@@ -529,17 +535,20 @@ than the default |m|:
 \end{verbatim}
 With no value, the default is restored. With |widest*|, the string is 
 built using |<integer>| as the value of the counter (e.g., with 
-\verb|\roman|, 
-\verb|widest=viii| and \verb|widest*=8| are the same).
+|\roman|, 
+|widest=viii| and |widest*=8| are the same).
 
 Since |\value| does not return a string but a number, |widest| and the
-\verb|*| values cannot be used with it. However, with \verb|widest*|,
+|*| values cannot be used with it. However, with |widest*|,
 being a number, it is allowed.
 
-\New{3.6} It can be used with |itemize| and |description|, too.
+\New{3.6} It can be used with |itemize| and |description|, too. 
+However, since the latter does some tricky formatting inside the label 
+you might need change the computed parameter (eg, |itemindent=*| with 
+|align=left|).
 
 \begin{desc}
-\verb|labelsep*=<length>|
+|labelsep*=<length>|
 \end{desc}
 
 Remember |labelsep| spans part of |leftmargin| and |itemindent| if the
@@ -780,24 +789,24 @@ following:
 \begin{description}
 \item[|standard|] Like |description| in standard classes, although
 with other classes it could be somewhat different.  The label is
-boxed.  Sets \verb|itemindent=!|.
+boxed.  Sets |itemindent=!|.
 
 \item[|unboxed|] Much like the standard |description|, but 
 the label is not boxed to avoid uneven spacing and unbroken labels if 
-they are long. Sets \verb|itemindent=!|.
+they are long. Sets |itemindent=!|.
 
 \item [|nextline|] If the label does not fit in the margin, the text
 continues in the next line, otherwise it is placed in a box of width
 |\leftmargin| $-$ |\labelsep|, i.e., the item body never sticks into
-the left margin.  Sets \verb|labelwidth=!|.
+the left margin.  Sets |labelwidth=!|.
 
 \item[|sameline|] Like |nextline| but if the label does not 
 fit in the margin the text continues in the same line. Same as
-\verb|style=unboxed,labelwidth=!|.
+|style=unboxed,labelwidth=!|.
 
 \item[|multiline|] The label is placed in a parbox whose width is 
 |leftmargin|, with several lines if 
-necessary. Same as \verb|style=standard,align=parleft,labelwidth=!|.
+necessary. Same as |style=standard,align=parleft,labelwidth=!|.
 
 \end{description}
 
@@ -806,7 +815,7 @@ necessary. Same as \verb|style=standard,align=parleft,labelwidth=!|.
 \item Mixing boxed and unboxed labels has not a well-defined behaviour.
 \item When nesting list all combinations are allowed but not all make
   sense.
-\item Nesting \verb|nextline| lists is not supported (it works, but its
+\item Nesting |nextline| lists is not supported (it works, but its
   behaviour might change in the future, because the current one is not
   what one could expect).
 \end{enumerate}
@@ -827,8 +836,8 @@ was not the intended behaviour.}
 \subsection{``Wide'' lists}
 
 \begin{desc}
-\verb|wide|\\
-\verb|wide=<parindent>|
+|wide|\\
+|wide=<parindent>|
 \end{desc}
 
 With this convenience key, the leftmargin is null and the label is
@@ -842,13 +851,13 @@ listparindent=\parindent, labelwidth=0pt, itemindent=!
 \end{verbatim}
 With |wide=<parindent>| you may set at once another value instead of
 |\parindent|.  Of course, these keys can be overriden after
-\verb|wide|, too; for example, remembering that with left-aligned labels
+|wide|, too; for example, remembering that with left-aligned labels
 the text is pushed if the they are wider than |labelwidth|, you
 can set |labelwidth=1.5em| for a minimal width, or instead of
 |itemindent=!| you may prefer |itemindent=*|, which sets the
 minimal width to that of widest label.  In level 2 you may prefer
 |labelindent=2\parindent|, and so on.  You may also want to
-combine it with |noitemsep| or |nolistsep|.
+combine it with |noitemsep| or |nosep|.
 
 \subsection{\textsf{enumerate}-like labels}
 \label{s.short}
@@ -938,10 +947,10 @@ defined can then be used like the others.
 
 \begin{warning}
   The package may introduce new keys in the future, so
-  \verb|\SetEnumitemKey| is a potential source of forward
+  |\SetEnumitemKey| is a potential source of forward
   incompatibilities. However, it's safe using a non-letter character
-  other than hyphen or star in the key name (e.g., \verb|:name| or
-  \verb|2_col|), because \textsf{enumitem} will not use them.
+  other than hyphen or star in the key name (e.g., |:name| or
+  |2_col|), because \textsf{enumitem} will not use them.
 \end{warning}
 
 \begin{desc}
@@ -966,10 +975,10 @@ So, you can left to the final design what |label=numeric| means.
 
 Inline lists are ``horizontal'' lists set as ordinary text inside a
 paragraph.  With this package you can create inline lists, as
-explained below, with \verb|\newlist|, which have their own labels and
+explained below, with |\newlist|, which have their own labels and
 counters.  However, very often inline versions of standard lists,
 with the same labelling schema, will be enough -- the package option
-\verb|inline| does that.
+|inline| does that.
 
 \begin{warning}
   Items are boxed, so floats are lost and nested lists are not allowed
@@ -1002,7 +1011,7 @@ names, not on list types).  This applies only to those created with
 below are independent and use their own labels and settings. 
 
 \begin{note}
-  Note \verb|inline| is not required if you do not need the inline
+  Note |inline| is not required if you do not need the inline
   versions of standard lists, but instead you define your own 
   standalone inline lists with |\newlist|.
 \end{note}
@@ -1025,7 +1034,7 @@ Format is set with keys \texttt{itemjoin} (default is a space), and
 An additional key is \texttt{itemjoin*}, which, if set, is used
 instead of \texttt{itemjoin} before the last item. 
 
-\verb|itemjoin| is ignored in vertical mode (i.e., in mode unboxed
+|itemjoin| is ignored in vertical mode (i.e., in mode unboxed
 and just after a quote, a displayed list and the like).
 
 \begin{example}
@@ -1062,8 +1071,8 @@ possible:
 \end{desc}
 Where |<level>| is the list level (one or more) in |list|, and the
 corresponding levels in |enumerate| and
-|itemize|.\footnote{\verb|\string\setenumerate|,
-\verb|\string\setitemize| and \verb|\string\setdescription| are
+|itemize|.\footnote{|\string\setenumerate|,
+|\string\setitemize| and |\string\setdescription| are
 deprecated.} With no |<levels>|, the format applies to all of them.
 Here `list' does not mean any list but only the three ones handled by
 this package, and those redefined by this package or defined with
@@ -1118,9 +1127,8 @@ this feature.
 |sizes| (package option)
 \end{desc}
 
-WORK IN PROGRESS: Lengths can
-contain size-based settings as follows (the value before the first $<$ 
-is a default). TODO -- An alternative |\setlist<size>|.
+Lengths can contain size-based settings as follows (the value before
+the first $<$ is a default).% TODO -- An alternative |\setlist<size>|.
 \begingroup
 \makeatletter
 \renewcommand\verbatim@font{\normalfont\ttfamily}
@@ -1133,9 +1141,10 @@ is a default). TODO -- An alternative |\setlist<size>|.
 \end{verbatim}
 \endgroup
 
-Names are accepted, too: script, tiny, footnote, small, normal, large, Large, LARGE,
-huge, Huge (ie, remove `size'). TODO - |\SetEnumitemSizes| to
-configure it.
+Names are accepted, too: |script|, |tiny|, |footnote|, |small|,
+|normal|, |large|, |Large|, |LARGE|, |huge|, |Huge| (ie, remove `size'
+from the \LaTeX{} name if necessary). For example:
+% TODO - |\SetEnumitemSizes| to configure it.
 \begingroup
 \makeatletter
 \renewcommand\verbatim@font{\normalfont\ttfamily}
@@ -1149,10 +1158,11 @@ configure it.
 \endgroup
 
 Single values take precedence over ranges. In ranges, the last match
-wins. The range |a-b| is $a \le \mbox{size} < b$. These rules allow
-the setting for 10 or |normal| in the logical place, as shown above.
-Remember nominal sizes are not always the real sizes -- for example,
-with option |11pt|, |\normalsize| (and |normal|) is 10.95.
+wins. The range |a-b| is $a \le \mbox{size} < b$ (the lower bound is
+included, but not the upper one). These rules allow in the examples
+above the setting for |10| or |normal| in the logical place. Remember
+nominal sizes are not always the real sizes -- for example, with option
+|11pt|, |\normalsize| (and |normal|) is 10.95.
 
 \section{Cloning the basic lists}
 \label{s.clone}
@@ -1195,13 +1205,14 @@ label=\arabic{stepsii}.\arabic{stepsi}
   |<list>|ii, |<list>|iii, etc. For this reason (both counter and list
   names), defining two lists as, say, |books| and |booksi| leads to
   unexpected results (currently without any warning, which should be
-  fixed). [TODO - Perhaps I should change the internal names, so that 
-  this restriction doesn't apply to itemize and description.]
+  fixed). 
+  % TODO - Perhaps I must change the internal names, so that 
+  % this restriction doesn't apply to itemize and description.]
 \end{warning}
 
 \begin{desc}
-\verb|\setlist[<names>,<levels>]{<keys/values>}|\\
-\verb|\setlist*[<names>,<levels>]{<keys/values>}|
+|\setlist[<names>,<levels>]{<keys/values>}|\\
+|\setlist*[<names>,<levels>]{<keys/values>}|
 \end{desc}
 
 After creating a list, you can (in fact you
@@ -1213,7 +1224,7 @@ must, at least the label) set the new list with |\setlist|:
 \setlist[steps,1,2]{label=(\arabic*)}
 \end{verbatim}
 Names in the optional argument of |\setlist| say which lists applies the
-settings to, and numbers say the level (it is calc-savvy).  Several
+settings to, and numbers say the level (it is |calc|-savvy).  Several
 lists and/or several levels can be given, and all combinations are
 set; e.g.:
 \begin{verbatim}
@@ -1223,23 +1234,23 @@ set; e.g.:
 No number (or 0) means ``all levels'' and no name means ``all lists''; no 
 optional argument means ``all lists at all levels''.
 
-The starred form \verb|\setlist*| adds the settings to the previous ones.
+The starred form |\setlist*| adds the settings to the previous ones.
 
 \begin{desc}
-\verb|\setlistdepth{<integer>}|
+|\setlistdepth{<integer>}|
 \end{desc}
 
 By default, \LaTeX{} has a limit of 5 nesting levels, but when 
 cloning lists this value may be too short, and therefore you may want 
 to set a new value. In levels below the 5th (or the deepest defined by a 
-class), the settings of the last are used (i.e., \verb|\@listvi|).
+class), the settings of the last are used (i.e., |\@listvi|).
 
 \section{More about counters}
 
 \subsection{New counter representation}
 
 \begin{desc}
-\verb|\AddEnumerateCounter{<LaTeX command>}{<internal command>}{<widest label>}|
+|\AddEnumerateCounter{<LaTeX command>}{<internal command>}{<widest label>}|
 \end{desc}
 
 ``Registers'' a counter representation so that \textsf{enumitem}
@@ -1307,11 +1318,11 @@ because its name is different.
 
 \section{Package options}
 
-Besides \verb|inline|, \verb|ignoredisplayed|, and \verb|shortlabels|,
-the following option is available.
+Besides |inline|, |ignoredisplayed|, |sizes| and
+|shortlabels|, the following option is available.
 
 \begin{desc}
-\verb|loadonly|
+|loadonly|
 \end{desc}
 
 With this package option the package is loaded but the three
@@ -1321,8 +1332,8 @@ even redefine the existing ones.
 \section{The trivlist issue}
 
 \LaTeX{} uses a simplified version of |list| named |trivlist| to set
-displayed material, like |center|, |verbatim|, \verb|tabbing|,
-\verb|theorem|, etc., even if conceptually they are not lists.
+displayed material, like |center|, |verbatim|, |tabbing|,
+|theorem|, etc., even if conceptually they are not lists.
 Unfortunately, |trivlist| uses the current list settings, which has
 the odd side effect that changing the vertical spacing of lists also
 changes sometimes the spacing in these environments.
@@ -1331,11 +1342,11 @@ This package modifies |trivlist| so that the default settings for
 the current level (ie, those set by the corresponding |clo| 
 files) are set again. In standard \LaTeX{} that is usually redundand, 
 but if we want to fine tune lists, not resetting the default values 
-could be a real issue (particularly if you use the |nolistsep| 
+could be a real issue (particularly if you use the |nosep| 
 option).
 
 A minimal control of vertical spacing has been made possible 
-with\footnote{\verb|\string\setdisplayed| is deprecated.}
+with\footnote{|\string\setdisplayed| is deprecated.}
 \begin{itemize}
 \item |\setlist[trivlist,<level>]{<keys/values>}|
 \end{itemize}
@@ -1346,6 +1357,8 @@ full-fledge |trivlist| formatter.
 If for some reason you do not want to change |trivlist| and preserve
 the original definition, you can use the package option
 |ignoredisplayed|.
+
+% TODO - Document it may be applied to quote, tabbing, etc.
 
 \New{3.6} If, on the other hand, you want to also apply the changes for
 all lists to trivlists, just set the package option |includedisplayed|.
@@ -1385,7 +1398,7 @@ Una olla de algo m\'{a}s vaca que carnero, salpic\'{o}n las m\'{a}s
 noches, duelos y quebrantos los s\'{a}bados...
 \end{verbatim}
 
-The rule shows \verb|labelindent|. 
+The rule shows |labelindent|. 
 
 \samplesep
 
@@ -1404,7 +1417,7 @@ noches, duelos y quebrantos los s\'{a}bados...
 
 With |\begin{enumerate}[leftmargin=*] % labelindent=0pt by default|. 
 
-The rule shows \verb|labelindent|.
+The rule shows |labelindent|.
 
 \samplesep
 
@@ -1423,7 +1436,7 @@ noches, duelos y quebrantos los s\'{a}bados...
 
 With |\begin{enumerate}[leftmargin=\parindent]|.
 
-The rule shows \verb|leftmargin|.
+The rule shows |leftmargin|.
 
 \samplesep
 
@@ -1444,7 +1457,7 @@ With |\begin{enumerate}[labelindent=\parindent,|\allowbreak
 | leftmargin=*,|\allowbreak| label=\Roman*.,|\allowbreak
 | widest=III,|\allowbreak| align=left]|.
 
-The rule shows \verb|labelindent|. Note 
+The rule shows |labelindent|. Note 
 
 \samplesep
 
@@ -1568,8 +1581,8 @@ noches, duelos y quebrantos los s\'{a}bados...
 
 \newsample
 
-Same, but with |multiline|. Note the text overlaps if
-the item body is too short.
+Same, but with |multiline|. Note the text overlaps if the item body is
+too short.
 
 \samplesep
 
@@ -1580,7 +1593,7 @@ no ha mucho tiempo que viv\'{\i}a un hidalgo de los de
 \item[Lo primero que ten\'{\i}a el Quijote] lanza en astillero,
 \item[Lo segundo] adarna antigua,
 \item[Lo tercero] roc\'{\i}n flaco, y
-\item[Y por \'{u}ltimo, lo cuar] galgo corredor.
+\item[Y por \'{u}ltimo, lo cuarto] galgo corredor.
 \end{description}
 Una olla de algo m\'{a}s vaca que carnero, salpic\'{o}n las m\'{a}s
 noches, duelos y quebrantos los s\'{a}bados...
@@ -1654,9 +1667,9 @@ Similarly, resuming a series and a list at the same time is allowed,
 too, but again its behaviour is not well-defined.
 
 \item (3.5.2) An incompatibility with 2.x has popped up -- if you were
-using the optional argument to pass a value to a \verb|\ref| or other 
+using the optional argument to pass a value to a |\ref| or other 
 macro requiring expandable macros, an error is raised. A quick fix 
-is letting \verb|\makelabel| to |\descriptionlabel| in \texttt{before}.
+is letting |\makelabel| to |\descriptionlabel| in \texttt{before}.
 
 \end{itemize}
 
@@ -1664,67 +1677,67 @@ is letting \verb|\makelabel| to |\descriptionlabel| in \texttt{before}.
 
 \begin{itemize}
 \item Inline lists, with keys to set how items are joined (ie, the
-punctuation between items).  Two modes are provided: \verb|boxed|  and
-\verb|unboxed|.
+punctuation between items).  Two modes are provided: |boxed|  and
+|unboxed|.
 
-\item \verb|\setlist| is \textsf{calc}-savvy (eg, for use in loops),
+\item |\setlist| is \textsf{calc}-savvy (eg, for use in loops),
 and you can set diferent lists and levels at once.  \item All lengths
-related to labels can take the value \verb|*| (and not only
-\verb|labelsep| and \verb|leftmargin|).  Its behaviour has been made
-consistent and there is new value \verb|!| which does not compute the
+related to labels can take the value |*| (and not only
+|labelsep| and |leftmargin|).  Its behaviour has been made
+consistent and there is new value |!| which does not compute the
 widest label.
 
-\item With \verb|\restartlist{<list-name>}|, list counters can be restarted (in
-case you are using \verb|resume|).
+\item With |\restartlist{<list-name>}|, list counters can be restarted (in
+case you are using |resume|).
 
-\item \verb|resume*| can be combined with other keys.
+\item |resume*| can be combined with other keys.
 
 \item Lists can be gathered globally using series, so that they are
 considered a single list.  To start a series just use
 |series=<series-name>| and then resume it with |resume=<series-name>| or
 |resume*=<series-name>|.
 
-\item The ``experimental'' \verb|fullwidth| has been replaced by a new key
-\verb|wide|.
+\item The ``experimental'' |fullwidth| has been replaced by a new key
+|wide|.
 
 \item|\SetLabelAlign| defines new align values.
 
-\item You can define ``abstract'' values (eg, \verb|label=numeric|) and
+\item You can define ``abstract'' values (eg, |label=numeric|) and
 new keys.
 \end{itemize}
 
 \begin{itemize}
-\item (3.2) \verb|start| and \verb|widest*| are \textsf{calc}-savvy.
-\item (3.2) \verb|\value| can be used with \verb|widest*|.
-\item (3.2) Some internal restrictions in \verb|\arabic| and the like
+\item (3.2) |start| and |widest*| are \textsf{calc}-savvy.
+\item (3.2) |\value| can be used with |widest*|.
+\item (3.2) Some internal restrictions in |\arabic| and the like
 has been removed.  It is more flexible at the cost of having a more
 ``relaxed'' error checking.
 \end{itemize}
 \subsection{Bug fixes}
 
 \begin{itemize}
-\item Star values (eg, \verb|leftmargin=*|) could not be overriden
+\item Star values (eg, |leftmargin=*|) could not be overriden
 and new values were ignored.
-\item \verb|nolistsep| as the first of several keys was not always
+\item |nolistsep| as the first of several keys was not always
 recognized and therefore treated like a short label
-(i.e., \verb|nol\roman*stsep|).
-\item \verb|labelwidth| did not always work (when there was a prior
-\verb|widest| and \verb|*|)
-\item With \verb|align=right| the label and the following text could
+(i.e., |nol\roman*stsep|).
+\item |labelwidth| did not always work (when there was a prior
+|widest| and |*|)
+\item With |align=right| the label and the following text could
 overlap.
-\item \verb|description| did not get the correct list level.
-\item At some point (2.x?) \verb|\value*| stopped working.
+\item |description| did not get the correct list level.
+\item At some point (2.x?) |\value*| stopped working.
 \item (3.1) Unfortunately, \textsf{xkeyval} ``kills'' 
 \textsf{keyval}, so the lattest has been replicated in 
 \textsf{enumitem}.
-\item (3.3) Fixes a serious bug -- with \verb|*| neither 
-\verb|itemize| nor \verb|description| worked.
-\item (3.4) Fixes bad spacing in mode boxed (misplaced \verb|\unskip| 
+\item (3.3) Fixes a serious bug -- with |*| neither 
+|itemize| nor |description| worked.
+\item (3.4) Fixes bad spacing in mode boxed (misplaced |\unskip| 
 before the first item and wrong spacefactor between items).
-\item (3.4) \verb|nolistsep| did not work as intended, but since the
-error has been there for several years, a new key \verb|nosep| is
+\item (3.4) |nolistsep| did not work as intended, but since the
+error has been there for several years, a new key |nosep| is
 provided.
-\item (3.4) The issue with \verb|nolistsep| with \verb|shortlabels| 
+\item (3.4) The issue with |nolistsep| with |shortlabels| 
 (see above) was not fixed in all cases. Hopefully now it is.
 \item (3.5.0) Fixed the fix related to the spacefactor between items.
 \item (3.5.0) Fixed a problem with nested boxed inline lists.

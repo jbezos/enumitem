@@ -10,11 +10,7 @@
 % ~~~~~~~
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{enumitem}[2018/11/25 v3.5.1471 Customized lists]
-
-\PackageWarning{enumitem}%
-  {*** This is a development version ***\MessageBreak
-   ***   Don't use for production    ***}%
+\ProvidesPackage{enumitem}[2018/11/30 v3.6 Customized lists]
 
 % Notes
 % ~~~~~
@@ -45,7 +41,9 @@
 % to ensure it works as intended. The original work is by
 % David Carlisle, under license LPPL. Once the code is here,
 % it could be optimized by adapting it to the specific needs
-% of titlesec (to do).
+% of enumitem (to do).
+
+% TODO - Update to the latest changes in keyval
 
 \def\enitkv@setkeys#1#2{%
   \def\enitkv@prefix{enitkv@#1@}%
@@ -282,8 +280,6 @@
 \def\enitkv@enumitem@widest#1{%
   \expandafter\let\csname enit@cw@\@enumctr\endcsname\relax
   \@namedef{enit@widest@\@enumctr}##1{#1}}
-
-  %%%% FIX - bug? format was not taken into account
 
 \def\enitkv@enumitem@widest#1{%
   \ifcase\enit@type  % enumerate
@@ -578,6 +574,8 @@
 \def\enit@addcounter@s#1#2#3{%
   \enit@addcounter{#1}{#2}%
     {\@nameuse{enit@sc@\expandafter\@gobble\string#2}{#3}}}
+    
+% TODO - \SetEnumerateCounter
 
 % The 5 basic counters:
 
@@ -705,13 +703,13 @@
 \enitkv@key{enumitem}{after*}{%
   \expandafter\def\expandafter\enit@after\expandafter
     {\enit@after#1}}
-    
+
 \enitkv@key{enumitem}{first}{%
-  \def\enit@first{#1}}
+  \def\enit@keyfirst{#1}}
 
 \enitkv@key{enumitem}{first*}{%
-  \expandafter\def\expandafter\enit@first\expandafter
-    {\enit@first#1}}
+  \expandafter\def\expandafter\enit@keyfirst\expandafter
+    {\enit@keyfirst#1}}
 
 % Miscelaneous keys
 % ================
@@ -929,7 +927,7 @@
    \let\enit@afterlabel\nobreakspace
    \let\enit@before\@empty
    \let\enit@after\@empty
-   \let\enit@first\@empty
+   \let\enit@keyfirst\@empty
    \let\enit@format\@firstofone % and NOT empty
    \let\enit@ref\relax
    \labelindent\z@skip
@@ -987,7 +985,8 @@
 % ================================
 % The following code is based on LaTeX (\DeclareFontShape). Only the
 % code for <> is preserved (no functions), and a default value can be
-% set before the first <>. The original work is by the LaTeX Team,
+% set before the first <>. In addition, here single values take 
+% precedende over ranges. The original work is by the LaTeX Team,
 % under license LPPL.
 
 \def\enit@ifnot@nil#1{%
@@ -1044,7 +1043,7 @@
   \ifdim\f@size\p@=
      \enit@ifunset{enit@sizefor@#1}{0#1\p@}{\@nameuse{enit@sizefor@#1}\p@}%
      \enit@simple@size#2<#3\@nnil
-     \let\enit@d\enit@c    %%%%% is this correct ???
+     \let\enit@d\enit@c
   \fi
   \enit@b}
 
@@ -1053,15 +1052,13 @@
   \let\enit@c\relax  % last in range
   \let\enit@d\relax  % single
   \expandafter\enit@extractrange\enit@a <-*>\@nil<\@nnil}
-  
+
 % \enit@setlength is defined in the options section
 
-% \def\enit@setlength#1#2{%
-%   \enit@try@size@range{#2}%  Returns \enit@c and or enit@d
-%   \ifx\enit@d\relax\else\let\enit@c\enit@d\fi
-%   \setlength#1{\enit@c}}
-
 % This ends the code adapted from latex (under LPPL).
+
+% TODO - \SetEnumitemSizes
+% TODO - \setlist<size>[opt]{..}
 
 \def\enit@getsizefor#1#2{%
   {\let\selectfont\relax
@@ -1364,7 +1361,7 @@
        \enit@ref
        \enit@calcleft
        \enit@before}%
-    \enit@first
+    \enit@keyfirst
   \fi}
 
 \let\enit@endenumerate\enit@endlist
@@ -1400,7 +1397,7 @@
         \enit@preset{#2}{#1}{#4}% 
         \enit@calcleft
         \enit@before}%
-    \enit@first
+    \enit@keyfirst
   \fi}
 
 \let\enit@enditemize\enit@endlist
@@ -1447,7 +1444,7 @@
            \aftergroup\enit@postlabel
          \fi}%
        \enit@before}%
-     \enit@first
+     \enit@keyfirst
   \fi}
 
 \let\enit@enddescription\enit@endlist
@@ -1482,6 +1479,7 @@
 \let\enitdp@center\@empty
 \let\enitdp@flushleft\@empty
 \let\enitdp@flushright\@empty
+\let\enitdp@tabbing\@empty
 
 % Description styles
 % ==================
@@ -1777,24 +1775,38 @@
 % |            TOOLS            |
 % +=============================+
 
-\def\DrawEnumitemLabel{% TODO - if before \item
-  \hbox{\hskip\@totalleftmargin
-        \hskip-\leftmargin
-        \vrule width \leftmargin height 8pt depth -7pt
-        \hskip\itemindent
-        \ifdim\labelindent<\z@
+\def\DrawEnumitemLabel{%
+  \ifvmode
+    \hbox{\hskip\@totalleftmargin
           \hskip-\leftmargin
-          \hskip\labelindent
-          \vrule width -\labelindent height 6pt depth -5pt
-          \hskip\labelindent            
-        \else
-          \hskip-\labelsep
-          \hskip-\labelwidth
-          \hskip-\labelindent
-          \vrule width \labelindent height 6pt depth -4pt           
-        \fi
-        \vrule width \labelwidth height 4pt depth -2pt
-        \vrule width \labelsep height 2pt}}
+          \vrule width \leftmargin height 8pt depth -7pt
+          \hskip\itemindent
+          \ifdim\labelindent<\z@
+            \hskip-\leftmargin
+            \hskip\labelindent
+            \vrule width -\labelindent height 6pt depth -5pt
+            \hskip\labelindent            
+          \else
+            \hskip-\labelsep
+            \hskip-\labelwidth
+            \hskip-\labelindent
+            \vrule width \labelindent height 6pt depth -4pt           
+          \fi
+          \vrule width \labelwidth height 4pt depth -2pt
+          \vrule width \labelsep height 2pt}%
+  \else
+  \enit@error
+     {\string\DrawEnumitemLabel\space must be used in vertical mode}%
+     {Very likely, just inserting a blank line before will fix it}}
+     
+% TODO -  option 'verbose'
+
+% +=============================+
+% |        TWO-PASS TOOLS       |
+% +=============================+
+
+% TODO - downstep
+% TODO - autowidest
 
 \endinput
 
