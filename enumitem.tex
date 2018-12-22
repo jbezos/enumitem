@@ -56,7 +56,7 @@
 suggestions go to \href{http://www.texnia.com/enumitem.html}%
 {\texttt{http://www.texnia.com/enumitem.html}}.}}
 
-\date{Version 3.6\\2018/11/30}
+\date{Version 3.6.1498\\2018/12/22}
 
 \IfFileExists{enumitem.sty}{\usepackage{enumitem}}{}
 
@@ -74,6 +74,18 @@ suggestions go to \href{http://www.texnia.com/enumitem.html}%
 \maketitle
 \tableofcontents
 
+\newpage
+
+\vspace*{1cm}
+
+\begin{note}
+  Changes and new features with relation to version 3.5 are highlighted
+  with \New{X.X}\hspace{-.5em}. The most recent features could be still
+  unstable. Please, report any issues you find on
+  \texttt{https://github.com/jbezos/enumitem/issues}, which is better
+  than just complaining on an e-mail list or a web forum.
+\end{note}
+
 \section{Introduction}
 
 This package provides most of the flexibility you may want to customize
@@ -81,7 +93,7 @@ the three basic list environments (|enumerate|, |itemize| and
 |description|) and to design your own lists, with a |<key>=<value>|
 syntax:
 \begin{itemize}
-\item Fancy labels and fancy refs, including a syntax similar to that 
+\item Fancy labels and fancy refs, including a syntax similar to that
 in the \textsf{enumerate} package.
 
 \item Alternative ways for positioning the label, with a new 
@@ -102,8 +114,8 @@ resuming.
 \end{itemize}
 
 In the interface a sort of ``inheritance'' is used. You can set
-globally the behaviour of lists and then override several parameters
-of, say, |enumerate| and then in turn override a few paremeters of a
+globally the behavior of lists and then override several parameters
+of, say, |enumerate| and then in turn override a few parameters of a
 particular instance. The values will be searched in the hierarchy.
 
 The package extends the syntax of the lists to allow an optional
@@ -135,7 +147,7 @@ Horizontal spacing:
 \end{itemize}
 
 \begin{example}
-  A straighforward example is:
+  A straightforward example is:
 \begin{verbatim}
 \begin{itemize}[itemsep=1ex,leftmargin=1cm]
 \end{verbatim}
@@ -194,6 +206,12 @@ This section describes the keys in displayed lists. Most of them are
 available in inline lists, where further keys are available (see
 \ref{s.inline}).
 
+\begin{warning}
+  If the value is completely enclosed in braces, they are removed. If
+  you want the braces, they must be duplicated. This is the default
+  behavior of \textsf{keyval}, which \textsf{enumitem} just emulates.
+\end{warning}
+
 \subsection{Label and cross references format}
 
 \begin{desc}
@@ -209,7 +227,7 @@ corresponding syntax.} It works with |\value|, too (provided the widest
 label is not to be computed or |widest*| is used, see below).
 
 \begin{note}
-  If you prefer setting labels like the \textsf{enumerate} package, use 
+  If you prefer setting labels like the \textsf{enumerate} package, use
   ``short labels'' (see section \ref{s.short}).
 \end{note}
 
@@ -261,7 +279,7 @@ on):
 By default, |label| sets also the form of cross references and
 |\the...| (overriding the settings in parent hierarchical
 levels), but you can define a different format with this key.  For
-example, to remove the right parethesis:
+example, to remove the right parenthesis:
 \begin{verbatim}
 \begin{enumerate}[label=\emph{\alph*}),ref=\emph{\alph*}]
 \end{verbatim}
@@ -282,7 +300,7 @@ example, to remove the right parethesis:
   The |label|s are \textit{not} accumulated to form the reference.
   If you want, say, something like 1.\textit{a} from 1) as first level
   and \textit{a}) as second level, you must set it with |ref|. You may
-  use |\ref{level1}.\ref{level2}| with appropiate |ref| settings, but as
+  use |\ref{level1}.\ref{level2}| with appropriate |ref| settings, but as
   Robin Fairbairns points out in the \TeX{} FAQ:
   \begin{quote}
   \dots{} [that] would be both tedious and error-prone. What is more, it 
@@ -342,9 +360,9 @@ to:
 \end{verbatim}
 
 \begin{example}
-  Although primarily intended for the alignment, this commands has other
-  uses (an example is the provided |parleft|).  For example, with the
-  following all labels with |align=right| are set as superscripts:
+  Although primarily intended for the alignment, this commands has
+  other uses (an example is the provided |parleft|). For example, with
+  the following all labels with |align=right| are set as superscripts:
 \begin{verbatim}
 \SetLabelAlign{right}{\hss\llap{\textsuperscript{#1}}}
 \end{verbatim}
@@ -352,9 +370,9 @@ to:
 \end{example}
 
 \begin{note}
-  If the last thing in the definition is a skip (typically |\hfil|), it is
-  removed sometimes by |description|. If for some reason you want to avoid
-  this, just add |\null| at the end.
+  If the last thing in the definition is a skip (typically |\hfil|), it
+  is removed sometimes by |description|. If for some reason you want to
+  avoid this, just add |\null| at the end.
 \end{note}
 
 \begin{note}
@@ -377,7 +395,7 @@ a future release.}
 \begin{tabular}{cc}
 \fbox{\fbox{\strut \texttt{labelindent}}
   \fbox{\strut \texttt{labelwidth}}
-  \fbox{\strut \texttt{labelsep} $-$ \texttt{itemintent}}}
+  \fbox{\strut \texttt{labelsep} $-$ \texttt{itemindent}}}
 &
 \fbox{\strut\texttt{itemindent}}\\
 \texttt{leftmargin}
@@ -391,11 +409,10 @@ Actually, the layout is more complex because the label box (ie,
 takes a negative value.
 
 \begin{note}
-  Since |\parindent| is not used as such inside lists, but instead
-  is set internally to either |\itemindent| or |\listparindent|,
-  when used as the value of a parameter \textsf{enumitem} returns
-  the global value, i. e., the value it has outside the outermost 
-  list. 
+  Since |\parindent| is not used as such inside lists, but instead is
+  set internally to either |\itemindent| or |\listparindent|, when used
+  as the value of a parameter \textsf{enumitem} returns the global
+  value, i. e., the value it has outside the outermost list.
 \end{note}
 
 \begin{note}
@@ -424,7 +441,7 @@ ignored.
 
 There is a new counter length |\labelindent|.
 
-The five parameteres are related in the following way:
+The five parameters are related in the following way:
 \[
 |\leftmargin|+|\itemindent| = 
 |\labelindent|+|\labelwidth|+|\labelsep|
@@ -614,7 +631,7 @@ leftmargin=2\parindent,
 itemsep=*
 \end{verbatim}
   Again, a variant would be the label aligned with the surrounding
-  text, and the itembody with |\parindent|:
+  text, and the item body with |\parindent|:
 \begin{verbatim}
 leftmargin=\parindent,
 itemsep=*
@@ -645,29 +662,30 @@ Text.
 \end{enumerate}
 \end{verbatim}
 
-This is done locally. If you want global resuming, see next section on series.
+This is done locally. If you want global resuming, see next section on
+series.
 
 \begin{desc}
 |resume*|
 \end{desc}
 
-Like |resume| but the options from the previous list are used,
-too.  This option must be restricted to the optional argument in a
-environment (this is the only place where it makes sense).  It should
-be used sparingly---if you are using it often, then very likely you
-want to define a new list (see \ref{s.clone}).  Further keys are allowed, and
-in this case the saved options are overriden by those in the current
-list (i.e., the position of \texttt{resume*} does not matters). 
-If there is a series of a certain list with
-\texttt{resume*}, options are taken from the list previous to the
-first one, except for \texttt{start}.
+Like |resume| but the options from the previous list are used, too.
+This option must be restricted to the optional argument in a
+environment (this is the only place where it makes sense). It should be
+used sparingly---if you are using it often, then very likely you want
+to define a new list (see \ref{s.clone}). Further keys are allowed, and
+in this case the saved options are overridden by those in the current
+list (i.e., the position of \texttt{resume*} does not matters). If
+there is a series of a certain list with \texttt{resume*}, options are
+taken from the list previous to the first one, except for
+\texttt{start}.
 
 \begin{example}
   For example:
 \begin{verbatim}
 \begin{enumerate}[resume*,start=1] % or [start=1,resume*]
 \end{verbatim}
-  uses the keys in the previuos \texttt{enumerate}, but restarts the
+  uses the keys in the previous \texttt{enumerate}, but restarts the
   counter.  
 \end{example}
 
@@ -697,15 +715,15 @@ alternative to |resume*=<series>|.
 \begin{example}
   Consider:
 \begin{verbatim}
-\begin{enumerate}[label=\arabic*(a),leftmargin=1cm,series=lafter]
+\begin{enumerate}[label=\arabic*(a),leftmargin=1cm,series=l_after]
 \item A
 \item B
 \end{enumerate}
 \end{verbatim}
   You get: 1(a)  2(a). You can continue with:
 \begin{verbatim}
-\begin{enumerate}[label=\arabic*(b),resume*=lafter]
-                 % or [label=\arabic*(b),lafter]
+\begin{enumerate}[label=\arabic*(b),resume*=l_after]
+                 % or [label=\arabic*(b),l_after]
 \item A
 \item B
 \end{enumerate}
@@ -715,14 +733,29 @@ alternative to |resume*=<series>|.
 
 Note you can add further arguments, which are executed after those
 saved at the starting list and therefore take precedence over them --
-in particular, |resume*| itself takes precedence over a
-|start| (e.g., |start=1|) in the the starting list.
+in particular, |resume*| itself takes precedence over a |start| (e.g.,
+|start=1|) in the the starting list.
 
 \begin{note}
   Every time a series is started, several commands are defined 
   internally. Thus, to avoid wasting resources use the same name for 
   non-overlapping series.
 \end{note}
+
+\begin{warning}
+  The package may introduce new keys in the future, so using directly
+  |<series>| as a key is a potential source of forward
+  incompatibilities. However, it's safe using a non-letter character
+  other than hyphen or star in the key name (e.g., |!notes| or
+  |m_steps|), as well as uppercase letters and digits, because
+  \textsf{enumitem} will never use them. \New{3.7} If you have defined
+  some series with an all lowercase name and a new conflicting key has
+  been introduced, an alternative to changing their names is the
+  package option |series=override| (the error message is
+  \texttt{Invalid series name `key'}). With it series names take
+  precedence over predefined keys -- but use it only when absolutely
+  necessary.
+\end{warning}
 
 \subsection{Penalties}
 
@@ -766,7 +799,7 @@ Same, but just before the list ends.
 |first=<code>|\qquad|first*=<code>|
 \end{desc}
 
-Same, but as the very first thing in the list body, so that
+\New{3.6} Same, but as the very first thing in the list body, so that
 \begin{verbatim}
 \begin{itemize}[first=<code>]
 \end{verbatim}
@@ -812,11 +845,11 @@ necessary. Same as |style=standard,align=parleft,labelwidth=!|.
 
 \begin{warning}
 \begin{enumerate}
-\item Mixing boxed and unboxed labels has not a well-defined behaviour.
+\item Mixing boxed and unboxed labels has not a well-defined behavior.
 \item When nesting list all combinations are allowed but not all make
   sense.
 \item Nesting |nextline| lists is not supported (it works, but its
-  behaviour might change in the future, because the current one is not
+  behavior might change in the future, because the current one is not
   what one could expect).
 \end{enumerate}
 \end{warning}
@@ -831,7 +864,7 @@ The key |noitemsep| kills the space between items and paragraphs
 (i.e., |itemsep=0pt| and |parsep=0pt|), while
 |nosep| kills all vertical spacing.\footnote{The key 
 \texttt{nolistsep}, now deprecated, introduced a thin stretch, which 
-was not the intended behaviour.}
+was not the intended behavior.}
 
 \subsection{``Wide'' lists}
 
@@ -850,7 +883,7 @@ align=left, leftmargin=0pt, labelindent=\parindent,
 listparindent=\parindent, labelwidth=0pt, itemindent=!
 \end{verbatim}
 With |wide=<parindent>| you may set at once another value instead of
-|\parindent|.  Of course, these keys can be overriden after
+|\parindent|.  Of course, these keys can be overridden after
 |wide|, too; for example, remembering that with left-aligned labels
 the text is pushed if the they are wider than |labelwidth|, you
 can set |labelwidth=1.5em| for a minimal width, or instead of
@@ -893,7 +926,7 @@ itemize environment under similar conditions, too:
 \end{desc}
 
 With this command, you can define new keys (or redefine them), which is
-particularly useful for enumerate to be adapted to especific
+particularly useful for enumerate to be adapted to specific
 typographical rules or to extend it for non-Latin scrips. Here
 |<replacement>| contains one of the starred versions of 
 counters.
@@ -947,10 +980,11 @@ defined can then be used like the others.
 
 \begin{warning}
   The package may introduce new keys in the future, so
-  |\SetEnumitemKey| is a potential source of forward
-  incompatibilities. However, it's safe using a non-letter character
-  other than hyphen or star in the key name (e.g., |:name| or
-  |2_col|), because \textsf{enumitem} will not use them.
+  |\SetEnumitemKey| is a potential source of forward incompatibilities.
+  However, it's safe using a non-letter character other than hyphen or
+  star in the key name (e.g., |:name| or |2_col|), as well as
+  uppercase letters and digits, because \textsf{enumitem} will never
+  use them.
 \end{warning}
 
 \begin{desc}
@@ -977,14 +1011,14 @@ Inline lists are ``horizontal'' lists set as ordinary text inside a
 paragraph.  With this package you can create inline lists, as
 explained below, with |\newlist|, which have their own labels and
 counters.  However, very often inline versions of standard lists,
-with the same labelling schema, will be enough -- the package option
+with the same labeling schema, will be enough -- the package option
 |inline| does that.
 
 \begin{warning}
   Items are boxed, so floats are lost and nested lists are not allowed
   (remember many displayed elements are defined as lists). Display math
   is forbidden too, and due to an optimization done by \TeX{} when
-  bulding lists, explicit hyphenation may be wrong.\footnote{A Knuthian
+  building lists, explicit hyphenation may be wrong.\footnote{A Knuthian
   ``premature optimization''? Who knows, but anyway Lua\TeX{} has
   removed it, so hyphenation with this engine should be correct.} There
   was a reason for this default setting, namely, this feature was
@@ -1001,19 +1035,19 @@ with the same labelling schema, will be enough -- the package option
 
 With the package option \texttt{inline}, three environments for inline
 lists are defined: \texttt{enumerate*}, \texttt{itemize*}, and
-\texttt{description*}.  They emulate the behaviour of
-\textsf{paralist} and \textsf{shortlst} in that labels and settings
-are shared with the displayed (ie, ``normal'') lists
-\texttt{enumerate}, \texttt{itemize} and \texttt{description},
-respectively (however, remember resuming is based on environment
-names, not on list types).  This applies only to those created with
-\texttt{inline} -- inline lists created with |\newlist| as described
-below are independent and use their own labels and settings. 
+\texttt{description*}. They emulate the behavior of \textsf{paralist}
+and \textsf{shortlst} in that labels and settings are shared with the
+displayed (ie, ``normal'') lists \texttt{enumerate}, \texttt{itemize}
+and \texttt{description}, respectively (however, remember resuming is
+based on environment names, not on list types). This applies only to
+those created with \texttt{inline} -- inline lists created with
+|\newlist| as described below are independent and use their own labels
+and settings.
 
 \begin{note}
-  Note |inline| is not required if you do not need the inline
-  versions of standard lists, but instead you define your own 
-  standalone inline lists with |\newlist|.
+  Note |inline| is not required if you do not need the inline versions
+  of standard lists, but instead you define your own standalone inline
+  lists with |\newlist|.
 \end{note}
 
 \begin{warning}
@@ -1055,7 +1089,7 @@ before=\unskip{: }, itemjoin={{; }}, itemjoin*={{, and }}
 If using floats, lists or displayed math inside inline lists is
 important, use an alternative ``mode'', which you can activate with
 \texttt{mode=unboxed} (the default is \texttt{mode=boxed}). With it,
-floats may be used freely, but misplaced |\item|s are not catched and
+floats may be used freely, but misplaced |\item|s are not caught and
 \texttt{itemjoin*} is ignored (a warning is written to the log about
 this fact).
 
@@ -1120,7 +1154,7 @@ This allows defining lists with the help of loops.
 
 \section{Size dependent settings}
 
-\New{3.6} The following package option is requrired for making use of
+\New{3.6} The following package option is required for making use of
 this feature.
 
 \begin{desc}
@@ -1163,6 +1197,26 @@ included, but not the upper one). These rules allow in the examples
 above the setting for |10| or |normal| in the logical place. Remember
 nominal sizes are not always the real sizes -- for example, with option
 |11pt|, |\normalsize| (and |normal|) is 10.95.
+
+For efficiency reasons, named sizes are assigned only once, when
+\textsf{enumitem} is loaded, in the assumption they are set by the
+class, or a local style loaded previously. 
+
+\begin{desc}
+|\SetEnumitemSize{<name>}{<selector>}|
+\end{desc}
+
+\New{3.7} If sizes are modified after loading \textsf{enumitem} or you
+are using a class with non standard sizes (or even you just want
+another names), they can be set or reset with the following tool.
+
+\begin{example}
+A trivial example:
+\begin{verbatim}
+\SetEnumitemSize{normal}{\normalsize}
+\SetEnumitemSize{large}{\large}
+\end{verbatim}
+\end{example}
 
 \section{Cloning the basic lists}
 \label{s.clone}
@@ -1340,7 +1394,7 @@ changes sometimes the spacing in these environments.
 
 This package modifies |trivlist| so that the default settings for 
 the current level (ie, those set by the corresponding |clo| 
-files) are set again. In standard \LaTeX{} that is usually redundand, 
+files) are set again. In standard \LaTeX{} that is usually redundant, 
 but if we want to fine tune lists, not resetting the default values 
 could be a real issue (particularly if you use the |nosep| 
 option).
@@ -1614,7 +1668,7 @@ fields---namely, label, title, and body---, so that enumerate and
 itemize has label (numbered and unnumbered) but no title, while
 description has title but no label.  In this model, one can have a
 description with entries marked with labels, as for example (of 
-course, this simple solution is far from satistactory):
+course, this simple solution is far from satisfactory):
 \begin{verbatim}
 \newcommand\litem[1]{\item{\bfseries #1,\enspace}}
 \begin{itemize}[label=\textbullet]
@@ -1656,15 +1710,15 @@ List resuming is based on environment names, and when a
 |\newenvironment| contains a list you may want to use |\begin{<list>}|
 and |\end{<list>}|. Using the corresponding low-level commands (ie,
 |\<list>| and |\end<list>|) is not an error, but it is your
-responsability to make sure the result is correct.
+responsibility to make sure the result is correct.
 
-\item The behaviour of mixed boxed labels (including enumerate and
+\item The behavior of mixed boxed labels (including enumerate and
 itemize) and unboxed labels is not well-defined.  The same applies to
 boxed and unboxed inline lists (which could even raise an error).
 
 \item
 Similarly, resuming a series and a list at the same time is allowed,
-too, but again its behaviour is not well-defined.
+too, but again its behavior is not well-defined.
 
 \item (3.5.2) An incompatibility with 2.x has popped up -- if you were
 using the optional argument to pass a value to a |\ref| or other 
@@ -1681,9 +1735,9 @@ punctuation between items).  Two modes are provided: |boxed|  and
 |unboxed|.
 
 \item |\setlist| is \textsf{calc}-savvy (eg, for use in loops),
-and you can set diferent lists and levels at once.  \item All lengths
+and you can set different lists and levels at once.  \item All lengths
 related to labels can take the value |*| (and not only
-|labelsep| and |leftmargin|).  Its behaviour has been made
+|labelsep| and |leftmargin|).  Its behavior has been made
 consistent and there is new value |!| which does not compute the
 widest label.
 
@@ -1693,9 +1747,9 @@ case you are using |resume|).
 \item |resume*| can be combined with other keys.
 
 \item Lists can be gathered globally using series, so that they are
-considered a single list.  To start a series just use
-|series=<series-name>| and then resume it with |resume=<series-name>| or
-|resume*=<series-name>|.
+considered a single list. To start a series just use
+|series=<series-name>| and then resume it with |resume=<series-name>|
+or |resume*=<series-name>|.
 
 \item The ``experimental'' |fullwidth| has been replaced by a new key
 |wide|.
@@ -1716,7 +1770,7 @@ has been removed.  It is more flexible at the cost of having a more
 \subsection{Bug fixes}
 
 \begin{itemize}
-\item Star values (eg, |leftmargin=*|) could not be overriden
+\item Star values (eg, |leftmargin=*|) could not be overridden
 and new values were ignored.
 \item |nolistsep| as the first of several keys was not always
 recognized and therefore treated like a short label

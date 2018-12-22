@@ -10,7 +10,7 @@
 % ~~~~~~~
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{enumitem}[2018/11/30 v3.6 Customized lists]
+\ProvidesPackage{enumitem}[2018/12/22 v3.6.1498 Customized lists]
 
 % Notes
 % ~~~~~
@@ -36,14 +36,11 @@
 % |      EMULATING KEYVAL       |
 % +=============================+
 %
-% "Thanks" to xkeyval, which uses the same macro names as
-% keyval :-(, the latter has to be replicated in full here
-% to ensure it works as intended. The original work is by
-% David Carlisle, under license LPPL. Once the code is here,
-% it could be optimized by adapting it to the specific needs
-% of enumitem (to do).
-
-% TODO - Update to the latest changes in keyval
+% "Thanks" to xkeyval, which uses the same macro names as keyval :-(,
+% the latter has to be replicated in full here to ensure it works as
+% intended. The original work is by David Carlisle, under license LPPL.
+% Once the code is here, it could be optimized by adapting it to the
+% specific needs of enumitem (to do).
 
 \def\enitkv@setkeys#1#2{%
   \def\enitkv@prefix{enitkv@#1@}%
@@ -76,7 +73,7 @@
   \expandafter\let\expandafter\@tempb
     \csname\enitkv@prefix\@tempa @default\endcsname
   \ifx\@tempb\relax
-    \enitkv@err{No value specified for \@tempa}%
+      \enitkv@err{No value specified for \@tempa}%
   \else
     \@tempb\relax
   \fi}
@@ -105,7 +102,9 @@
    {\let\enitkv@toks@\KV@toks@}
 
 \def\enitkv@key#1#2{%
-  \@ifnextchar[{\enitkv@def{#1}{#2}}{\@namedef{enitkv@#1@#2}####1}}
+  \@ifnextchar[%
+    {\enitkv@def{enumitem#1}{#2}}%
+    {\@namedef{enitkv@enumitem#1@#2}####1}}
 
 \def\enitkv@def#1#2[#3]{%
   \@namedef{enitkv@#1@#2@default\expandafter}\expandafter
@@ -179,7 +178,7 @@
 \def\enit@error{\PackageError{enumitem}}
 
 \def\enit@checkerror#1#2{%
-  \enit@error{Unknown value `#2' for key `#1'}%
+  \enit@error{Unknown value '#2' for key '#1'}%
       {See the manual for valid values}} 
 
 \def\enit@itemerror{%
@@ -188,21 +187,21 @@
        item or the last item has no text}} 
 
 \def\enit@noserieserror#1{%
-  \enit@error{Series `#1' not started}%
+  \enit@error{Series '#1' not started}%
       {You are trying to continue a series\MessageBreak
-       which has not been started with series}} 
+       which has not been started with 'series'}} 
 
 \def\enit@checkseries#1{%
   \ifcase\enit@resuming
-    \enit@error{Misplaced key `#1'}%
-      {`series' and `resume*' must be used\MessageBreak
+    \enit@error{Misplaced key '#1'}%
+      {'series' and 'resume*' must be used\MessageBreak
        in the optional argument of lists}%
   \fi}
 
 \def\enit@checkseries@m{%
   \ifcase\enit@resuming\else
     \enit@error{Uncompatible series settings}%
-      {`series' and `resume*' must not be used\MessageBreak
+      {'series' and 'resume*' must not be used\MessageBreak
        at the same time}%
   \fi}
 
@@ -227,31 +226,30 @@
 % Including code executed by keys.
 %
 % There are 2 keyval groups: enumitem, and enumitem-delayed.
-% The latter is used to make sure a prioritary key is the
-% latest one; eg, ref, so that the ref format set by label
-% is overriden. So, when this key is found in enumitem,
-% nothing is done, except the key/value is moved to 
-% enumitem-delayed.
+% The latter is used to make sure a prioritary key is the latest one;
+% eg, ref, so that the ref format set by label is overriden. So, when
+% this key is found in enumitem, nothing is done, except the key/value
+% is moved to enumitem-delayed.
 %
-% A further group (enumitem-resume) catches resume* and
-% series in optional arguments in lists.
+% A further group (enumitem-resume) catches resume* and series in
+% optional arguments in lists.
 %
 % Vertical spacing
 % ================
 
-\enitkv@key{enumitem}{topsep}{%
+\enitkv@key{}{topsep}{%
   \enit@setlength\topsep{#1}}
 
-% \enitkv@key{enumitem}{bottomsep}{%
+% \enitkv@key{}{bottomsep}{%
   % \def\enit@bottomsep{#1}}
 
-\enitkv@key{enumitem}{itemsep}{%
+\enitkv@key{}{itemsep}{%
   \enit@setlength\itemsep{#1}}
 
-\enitkv@key{enumitem}{parsep}{%
+\enitkv@key{}{parsep}{%
   \enit@setlength\parsep{#1}}
 
-\enitkv@key{enumitem}{partopsep}{%
+\enitkv@key{}{partopsep}{%
   \enit@setlength\partopsep{#1}}
 
 % Horizontal spacing
@@ -293,14 +291,14 @@
   \expandafter\let\csname enit@cw@\@enumctr\endcsname\relax
   \expandafter\let\csname enit@widest@\@enumctr\endcsname\relax}
 
-\enitkv@key{enumitem}{widest*}{%
+\enitkv@key{}{widest*}{%
   \setcounter{enit@cnt}{#1}%
   \expandafter\edef\csname enit@cw@\@enumctr\endcsname
     {\the\c@enit@cnt}%
   \expandafter\edef\csname enit@widest@\@enumctr\endcsname##1%
     {##1{\the\c@enit@cnt}}}
 
-\enitkv@key{enumitem}{labelindent*}{%
+\enitkv@key{}{labelindent*}{%
   \enit@lblfrommargintrue
   \ifnum\enit@calc=\z@
     \enit@calcwidestfalse
@@ -308,14 +306,14 @@
   \enit@setlength\labelindent{#1}%
   \advance\labelindent\leftmargin}
 
-\enitkv@key{enumitem}{labelindent}{%
+\enitkv@key{}{labelindent}{%
   \enit@lblfrommarginfalse
   \enit@calcset\labelindent\z@{#1}}
 
-\enitkv@key{enumitem}{labelwidth}{%
+\enitkv@key{}{labelwidth}{%
   \enit@calcset\labelwidth\@ne{#1}}
 
-\enitkv@key{enumitem}{leftmargin}{%
+\enitkv@key{}{leftmargin}{%
   \edef\enit@c{\the\leftmargin}%
   \enit@calcset\leftmargin\thr@@{#1}%
   \ifenit@lblfrommargin
@@ -323,7 +321,7 @@
     \advance\labelindent\leftmargin
   \fi}
 
-\enitkv@key{enumitem}{itemindent}{%
+\enitkv@key{}{itemindent}{%
   \edef\enit@c{\the\itemindent}%
   \enit@calcset\itemindent\enit@iv{#1}%
   \ifenit@sepfrommargin
@@ -331,15 +329,15 @@
     \advance\labelsep\itemindent
   \fi}
 
-\enitkv@key{enumitem}{listparindent}{%
+\enitkv@key{}{listparindent}{%
   \enit@setlength\listparindent{#1}}
 
-\enitkv@key{enumitem}{rightmargin}{%
+\enitkv@key{}{rightmargin}{%
   \enit@setlength\rightmargin{#1}}
 
 % labelsep, from itemindent; labelsep*, from leftmargin
 
-\enitkv@key{enumitem}{labelsep*}{%
+\enitkv@key{}{labelsep*}{%
   \enit@sepfrommargintrue
   \ifnum\enit@calc=\tw@
     \enit@calcwidestfalse
@@ -348,11 +346,11 @@
   \enit@setlength\labelsep{#1}%
   \advance\labelsep\itemindent}
 
-\enitkv@key{enumitem}{labelsep}{%
+\enitkv@key{}{labelsep}{%
   \enit@sepfrommarginfalse
   \enit@calcset\labelsep\tw@{#1}}
 
-\enitkv@key{enumitem}{left}{%
+\enitkv@key{}{left}{%
   \enit@setleft#1..\@empty..\@@}
 
 \def\enit@setleft#1..#2..#3\@@{%
@@ -368,15 +366,24 @@
 % Series, resume and start
 % ========================
 
-\enitkv@key{enumitem-resume}{series}{%
+\enitkv@key{-resume}{series}{%
   \enit@checkseries@m
-  \let\enit@resuming\@ne
-  \enit@ifunset{enitkv@enumitem@#1}{}%
-    {\enit@error{Invalid series name `#1'}%
-       {Do not name a series with an existing key}}%
+  \let\enit@resuming\@ne  %%% TODO - default check also \Set..Key
+  \ifcase\enit@seriesopt
+    \enit@ifunset{enitkv@enumitem@#1}{}%
+      {\enit@error
+        {Invalid series name '#1'}%
+        {Do not name a series with an existing key}}%
+  \else  % series=override
+    \global\@namedef{enitkv@enumitem@#1}%
+      {\enit@error
+        {Key '#1' has been overriden by a series}%
+        {Change the series name or deactivate series=override}}%
+    \global\@namedef{enitkv@enumitem@#1@default}{}%
+  \fi
   \def\enit@series{#1}}
 
-\enitkv@key{enumitem}{series}{%
+\enitkv@key{}{series}{%
   \enit@checkseries{series}}
 
 \def\enitkv@enumitem@resume#1{%
@@ -401,45 +408,45 @@
     \csname enit@resumekeys@\@currenvir\endcsname
   \@nameuse{enit@resume@\@currenvir}\relax}
 
-\enitkv@key{enumitem}{resume*}[]{%
+\enitkv@key{}{resume*}[]{%
   \enit@checkseries{resume*}}
 
 \newcommand\restartlist[1]{%
   \enit@ifunset{end#1}%
-    {\enit@error{Undefined list `#1'}%
+    {\enit@error{Undefined list '#1'}%
       {No list has been defined with that name.}}%
     {\expandafter\let
      \csname enit@resume@#1\endcsname\@empty}}
 
-\enitkv@key{enumitem}{start}[\@ne]{%
+\enitkv@key{}{start}[\@ne]{%
   \setcounter{\@listctr}{#1}%
   \advance\@nameuse{c@\@listctr}\m@ne}
 
 % Penalties
 % =========
 
-\enitkv@key{enumitem}{beginpenalty}{%
+\enitkv@key{}{beginpenalty}{%
   \@beginparpenalty#1\relax}
 
-\enitkv@key{enumitem}{midpenalty}{%
+\enitkv@key{}{midpenalty}{%
   \@itempenalty#1\relax}
 
-\enitkv@key{enumitem}{endpenalty}{%
+\enitkv@key{}{endpenalty}{%
   \@endparpenalty#1\relax}
 
 % Font/Format
 % ===========
 
-\enitkv@key{enumitem}{format}{%
+\enitkv@key{}{format}{%
   \def\enit@format{#1}}
 
-\enitkv@key{enumitem}{font}{%
+\enitkv@key{}{font}{%
   \def\enit@format{#1}}
 
 % Description styles
 % ==================
 
-\enitkv@key{enumitem}{style}[normal]{%
+\enitkv@key{}{style}[normal]{%
   \enit@ifunset{enit@style@#1}%
     {\enit@checkerror{style}{#1}}%
     {\enit@nextlinefalse
@@ -473,7 +480,7 @@
 % Aligment
 % --------
 
-\enitkv@key{enumitem}{align}{%
+\enitkv@key{}{align}{%
   \enit@ifunset{enit@align@#1}%
     {\enit@checkerror{align}{#1}}%
     {\csname enit@align@#1\endcsname}}
@@ -502,11 +509,11 @@
 % (2) set ref to @itemlabel, if there is label but not ref
 % (3) set ref to ref, if there is ref (with or without label)
 
-\enitkv@key{enumitem}{label}{%
+\enitkv@key{}{label}{%
   \expandafter\def\@itemlabel{#1}%
   \def\enit@ref{\expandafter\enit@reflabel\@itemlabel\z@}}
 
-\enitkv@key{enumitem}{label*}{%
+\enitkv@key{}{label*}{%
   \ifnum\enit@depth=\@ne
     \expandafter\def\@itemlabel{#1}%
   \else % no level 0
@@ -519,15 +526,15 @@
   \fi
   \def\enit@ref{\expandafter\enit@reflabel\@itemlabel\z@}}
 
-% ref is set by label, except if there is an explicit ref
-% in the same hierarchy level. Explicit refs above the
-% current hierarchy level are overriden by label (besides ref),
-% too. Since an explicit ref has preference, it's delayed.
+% ref is set by label, except if there is an explicit ref in the same
+% hierarchy level. Explicit refs above the current hierarchy level are
+% overriden by label (besides ref), too. Since an explicit ref has
+% preference, it's delayed.
 
-\enitkv@key{enumitem}{ref}{%
+\enitkv@key{}{ref}{%
   \g@addto@macro\enit@delayedkeys{,ref=#1}}
 
-\enitkv@key{enumitem-delayed}{ref}{%
+\enitkv@key{-delayed}{ref}{%
   \def\enit@ref{\enit@reflabel{#1}\@ne}}
 
 % #2=0 don't "normalize" (ie, already normalized)
@@ -574,7 +581,7 @@
 \def\enit@addcounter@s#1#2#3{%
   \enit@addcounter{#1}{#2}%
     {\@nameuse{enit@sc@\expandafter\@gobble\string#2}{#3}}}
-    
+
 % TODO - \SetEnumerateCounter
 
 % The 5 basic counters:
@@ -591,19 +598,19 @@
 % Labels
 % ------
 
-\enitkv@key{enumitem}{itemjoin}{%
+\enitkv@key{}{itemjoin}{%
   \def\enit@itemjoin{#1}}
 
-\enitkv@key{enumitem}{itemjoin*}{%
+\enitkv@key{}{itemjoin*}{%
   \def\enit@itemjoin@s{#1}}
 
-\enitkv@key{enumitem}{afterlabel}{%
+\enitkv@key{}{afterlabel}{%
   \def\enit@afterlabel{#1}}
 
 % Mode
 % ----
 
-\enitkv@key{enumitem}{mode}{%
+\enitkv@key{}{mode}{%
   \enit@ifunset{enit@mode#1}%
     {\enit@checkerror{mode}{#1}}%
     {\csname enit@mode#1\endcsname}}
@@ -690,47 +697,47 @@
 % Pre and post code
 % =================
 
-\enitkv@key{enumitem}{before}{%
+\enitkv@key{}{before}{%
   \def\enit@before{#1}}
 
-\enitkv@key{enumitem}{before*}{%
+\enitkv@key{}{before*}{%
   \expandafter\def\expandafter\enit@before\expandafter
     {\enit@before#1}}
 
-\enitkv@key{enumitem}{after}{%
+\enitkv@key{}{after}{%
   \def\enit@after{#1}}
 
-\enitkv@key{enumitem}{after*}{%
+\enitkv@key{}{after*}{%
   \expandafter\def\expandafter\enit@after\expandafter
     {\enit@after#1}}
 
-\enitkv@key{enumitem}{first}{%
+\enitkv@key{}{first}{%
   \def\enit@keyfirst{#1}}
 
-\enitkv@key{enumitem}{first*}{%
+\enitkv@key{}{first*}{%
   \expandafter\def\expandafter\enit@keyfirst\expandafter
     {\enit@keyfirst#1}}
 
 % Miscelaneous keys
 % ================
 
-\enitkv@key{enumitem}{nolistsep}[true]{%
+\enitkv@key{}{nolistsep}[true]{%
   \partopsep=\z@skip
   \topsep=\z@ plus .1pt
   \itemsep=\z@skip
   \parsep=\z@skip}
 
-\enitkv@key{enumitem}{nosep}[true]{%
+\enitkv@key{}{nosep}[true]{%
   \partopsep=\z@skip
   \topsep=\z@skip
   \itemsep=\z@skip
   \parsep=\z@skip}
 
-\enitkv@key{enumitem}{noitemsep}[true]{%
+\enitkv@key{}{noitemsep}[true]{%
   \itemsep=\z@skip
   \parsep=\z@skip}
 
-\enitkv@key{enumitem}{wide}[\parindent]{%
+\enitkv@key{}{wide}[\parindent]{%
   \enit@align@left
   \leftmargin\z@
   \labelwidth\z@
@@ -740,7 +747,7 @@
 
 % The following is deprecated in favour of wide:
 
-\enitkv@key{enumitem}{fullwidth}[true]{%
+\enitkv@key{}{fullwidth}[true]{%
   \leftmargin\z@
   \labelwidth\z@
   \def\enit@align##1{\hskip\labelsep##1}}
@@ -754,7 +761,7 @@
 \newcommand\SetEnumitemValue[2]{% Implicit #3
   \enit@ifunset{enit@enitkv@#1}%
     {\enit@ifunset{enitkv@enumitem@#1}%
-       {\enit@error{Wrong key `#1' in \string\SetEnumitemValue}%
+       {\enit@error{Wrong key '#1' in \string\SetEnumitemValue}%
           {Perhaps you have misspelled it}}{}%
      \expandafter\let\csname enit@enitkv@#1\expandafter\endcsname
        \csname enitkv@enumitem@#1\endcsname}{}%
@@ -772,8 +779,8 @@
 
 \newcommand\SetEnumitemKey[2]{%
   \enit@ifunset{enitkv@enumitem@#1}%
-    {\enitkv@key{enumitem}{#1}[]{\enitkv@setkeys{enumitem}{#2}}}%
-    {\enit@error{Duplicated key `#1' in \string\SetEnumitemKey}%
+    {\enitkv@key{}{#1}[]{\enitkv@setkeys{enumitem}{#2}}}%
+    {\enit@error{Duplicated key '#1' in \string\SetEnumitemKey}%
        {There already exists a key with that name}}}
 
 % +=============================+
@@ -815,7 +822,7 @@
       {\csname enit@widest\expandafter\@gobbletwo\string##1\endcsname{#4}}}}
 
 \def\enit@valueerror#1{\z@ % if after an assignment, but doesn't catch \ifnum
-   \enit@error{No default \string\value\space for `#1'}%
+   \enit@error{No default \string\value\space for '#1'}%
      {You can provide one with widest*}}%
 
 \let\enit@values\@empty
@@ -971,7 +978,7 @@
     \noexpand\enitkv@setkeys{enumitem-resume}{\the\enit@toks}}%
   \enit@b
   \let\enitkv@errx\enitkv@err@b
-  \ifcase\enit@resuming\or\or % = 2
+  \ifcase\enit@resuming\or\or % = 2, resume* series
     \expandafter
     \enit@setkeys@i\enit@resumekeys,resume=\enit@series\@@
   \or % = 3
@@ -1051,30 +1058,30 @@
   \def\enit@a{#1}%
   \let\enit@c\relax  % last in range
   \let\enit@d\relax  % single
-  \expandafter\enit@extractrange\enit@a <-*>\@nil<\@nnil}
+  \expandafter\enit@extractrange\enit@a <-*>\@nil<\@nnil
+  \ifx\enit@d\relax\else\let\enit@c\enit@d\fi}
 
 % \enit@setlength is defined in the options section
 
 % This ends the code adapted from latex (under LPPL).
 
-% TODO - \SetEnumitemSizes
 % TODO - \setlist<size>[opt]{..}
 
-\def\enit@getsizefor#1#2{%
+\def\SetEnumitemSize#1#2{%
   {\let\selectfont\relax
    #2%
    \expandafter\xdef\csname enit@sizefor@#1\endcsname{\f@size}}}   
 
-\enit@getsizefor{script}\scriptsize
-\enit@getsizefor{tiny}\tiny
-\enit@getsizefor{footnote}\footnotesize
-\enit@getsizefor{small}\small
-\enit@getsizefor{normal}\normalsize
-\enit@getsizefor{large}\large
-\enit@getsizefor{Large}\Large
-\enit@getsizefor{LARGE}\LARGE
-\enit@getsizefor{huge}\huge
-\enit@getsizefor{Huge}\Huge   
+\SetEnumitemSize{script}\scriptsize
+\SetEnumitemSize{tiny}\tiny
+\SetEnumitemSize{footnote}\footnotesize
+\SetEnumitemSize{small}\small
+\SetEnumitemSize{normal}\normalsize
+\SetEnumitemSize{large}\large
+\SetEnumitemSize{Large}\Large
+\SetEnumitemSize{LARGE}\LARGE
+\SetEnumitemSize{huge}\huge
+\SetEnumitemSize{Huge}\Huge   
 
 % +=============================+
 % |         LIST TYPES          |
@@ -1581,7 +1588,7 @@
       \expandafter{\enit@b,#4}%
   \fi}
 
-% To do: more robust tests (catch wrong names, but not easy)
+% TODO: more robust tests (catch wrong key names, but not easy)
 
 % Internally, LaTeX uses a short name for enumerate (enum)
 % and itemize (item). To be consistent with this convention,
@@ -1595,6 +1602,15 @@
   \@ifstar{\enit@setlist\@ne}{\enit@setlist\z@}}
 
 \def\enit@setlist#1{%
+  \@ifnextchar<%
+    {\enit@setlist@q#1}%
+    {\let\enit@forsize\@empty\enit@setlist@n#1}}
+
+\def\enit@setlist@q#1<#2>{%
+  \def\enit@forsize{<#2>}%
+  \enit@setlist@n#1}
+
+\def\enit@setlist@n#1{%
   \@ifnextchar[{\enit@setlist@x#1}{\enit@setlist@i#1\@empty}}
 
 % Let's accept \setlist[]*{}, too, because an error in <=3.5.1
@@ -1670,7 +1686,7 @@
 
 \def\enit@newlist#1#2#3#4{%
   \enit@ifunset{enit@xset@#3}%
-    {\enit@error{Unknown list type `#3')}%
+    {\enit@error{Unknown list type '#3')}%
           {Valid types are:
            enumerate, itemize, description,\MessageBreak
            enumerate*, itemize*, description*}}%
@@ -1709,6 +1725,9 @@
 % |       PACKAGE OPTIONS       |
 % +=============================+
 
+% TODO - series=override
+%      - series=explicit / resume
+
 \newif\ifenit@loadonly
 
 \DeclareOption{ignoredisplayed}{\let\enit@trivlist\trivlist}
@@ -1717,7 +1736,9 @@
     \enit@setkeys{list}%
     \enit@setkeys{list\romannumeral\@listdepth}}}
 \let\enit@setglobalkeys\relax
+
 \DeclareOption{loadonly}{\enit@loadonlytrue}
+
 \DeclareOption{shortlabels}
   {\def\enit@shl#1{%
      \ifnum\enit@type=\tw@
@@ -1726,6 +1747,7 @@
        \def\enit@c{#1}%
        \enit@first#1,\@nil\@@nil % Returns enit@toks
     \fi}}
+
 \DeclareOption{inline}
   {\newenvironment{enumerate*}[1][]%
      {\@nameuse{enit@enumerate*}\enitdp@enumerate{enum}\thr@@{#1}}
@@ -1740,9 +1762,11 @@
 \let\enit@setlength\setlength
 \DeclareOption{sizes}     
   {\def\enit@setlength#1#2{%
-     \enit@try@size@range{#2}%  Returns \enit@c and or enit@d
-     \ifx\enit@d\relax\else\let\enit@c\enit@d\fi
+     \enit@try@size@range{#2}%  Returns \enit@c
      \setlength#1{\enit@c}}}
+
+\chardef\enit@seriesopt\z@
+\DeclareOption{series=override}{\chardef\enit@seriesopt\tw@}
 
 \let\enit@shl\enit@toks
 
@@ -1798,7 +1822,7 @@
   \enit@error
      {\string\DrawEnumitemLabel\space must be used in vertical mode}%
      {Very likely, just inserting a blank line before will fix it}}
-     
+
 % TODO -  option 'verbose'
 
 % +=============================+
