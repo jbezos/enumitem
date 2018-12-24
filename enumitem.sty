@@ -10,7 +10,7 @@
 % ~~~~~~~
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{enumitem}[2018/12/22 v3.6.1498 Customized lists]
+\ProvidesPackage{enumitem}[2018/12/24 v3.6.1500 Customized lists]
 
 % Notes
 % ~~~~~
@@ -792,14 +792,23 @@
 
 \def\enit@setkeys#1{%
   \enit@ifunset{enit@@#1}{}%
-    {\expandafter\expandafter\expandafter
-     \enit@setkeys@i\csname enit@@#1\endcsname\@@}}
+    {\let\enit@c\@empty
+     \enit@ifunset{enit@@#1@@sizes}{}%
+      {\expandafter\let\expandafter\enit@a\csname enit@@#1@@sizes\endcsname
+       \expandafter\enit@try@size@range\expandafter{\enit@a}%
+       \def\enit@keys@sizes{\def\enit@c}%
+       \enit@c
+       \let\enit@keys@sizes\relax}%
+     \expandafter\expandafter\expandafter
+       \enit@setkeys@i
+       \csname enit@@#1\expandafter\endcsname
+       \expandafter,\enit@c\@@}}
 
 % The following is used directly in resumeset:
 
 \def\enit@setkeys@i#1\@@{%
   \let\enit@delayedkeys\@empty
-  \enit@shl{#1}% is or returns \enit@toks
+  \enit@shl{#1}% is either \enit@toks or returns it
   \expandafter\enit@setkeys@ii\the\enit@toks\@@}
 
 \def\enit@setkeys@ii#1\@@{%
@@ -1572,20 +1581,39 @@
 % Remember \romannumeral0 expands to nothing.
 % #1 = list name, #2 = level, #3 = flag if star, #4 = keys/values
 
+\let\enit@keys@sizes\relax
+
 \def\enit@saveset#1#2#3#4{%
   \setcounter{enit@cnt}{#2}%
-  \ifcase#3%
-    \expandafter
-    \def\csname enit@@#1\romannumeral\c@enit@cnt\endcsname{#4}%
-  \or
+  \ifx\enit@forsize\@empty
+    \ifcase#3%
+      \expandafter
+      \def\csname enit@@#1\romannumeral\c@enit@cnt\endcsname{#4}%
+    \or
+      \expandafter\let\expandafter\enit@b
+        \csname enit@@#1\romannumeral\c@enit@cnt\endcsname
+      \ifx\enit@b\relax
+        \let\enit@b\@empty
+      \fi
+      \expandafter\def
+        \csname enit@@#1\romannumeral\c@enit@cnt\expandafter\endcsname
+        \expandafter{\enit@b,#4}%
+    \fi
+  \else
+    \enit@ifunset{enit@@#1\romannumeral\c@enit@cnt}%
+      {\expandafter\let
+       \csname enit@@#1\romannumeral\c@enit@cnt\endcsname\@empty}%
+      {}%
     \expandafter\let\expandafter\enit@b
-      \csname enit@@#1\romannumeral\c@enit@cnt\endcsname
+      \csname enit@@#1\romannumeral\c@enit@cnt @@sizes\endcsname
     \ifx\enit@b\relax
       \let\enit@b\@empty
     \fi
+    \toks@\expandafter{\enit@b}%
+    \edef\enit@b{\the\toks@\enit@forsize\enit@keys@sizes}%
     \expandafter\def
-      \csname enit@@#1\romannumeral\c@enit@cnt\expandafter\endcsname
-      \expandafter{\enit@b,#4}%
+      \csname enit@@#1\romannumeral\c@enit@cnt @@sizes\expandafter\endcsname
+      \expandafter{\enit@b{#4}}%
   \fi}
 
 % TODO: more robust tests (catch wrong key names, but not easy)

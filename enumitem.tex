@@ -56,7 +56,7 @@
 suggestions go to \href{http://www.texnia.com/enumitem.html}%
 {\texttt{http://www.texnia.com/enumitem.html}}.}}
 
-\date{Version 3.6.1498\\2018/12/22}
+\date{Version 3.6.1500\\2018/12/24}
 
 \IfFileExists{enumitem.sty}{\usepackage{enumitem}}{}
 
@@ -1196,7 +1196,11 @@ wins. The range |a-b| is $a \le \mbox{size} < b$ (the lower bound is
 included, but not the upper one). These rules allow in the examples
 above the setting for |10| or |normal| in the logical place. Remember
 nominal sizes are not always the real sizes -- for example, with option
-|11pt|, |\normalsize| (and |normal|) is 10.95.
+|11pt|, |\normalsize| (and |normal|) is 10.95. You may precede a value
+with several single qualifiers like
+\texttt{<}|small|\texttt{><}|normal|\texttt{>}|12pt|.\footnote{Note
+this syntax follows closely that of \texttt{\string\DeclareFontShape},
+except in the precedence of single values.}
 
 For efficiency reasons, named sizes are assigned only once, when
 \textsf{enumitem} is loaded, in the assumption they are set by the
@@ -1217,6 +1221,26 @@ A trivial example:
 \SetEnumitemSize{large}{\large}
 \end{verbatim}
 \end{example}
+
+\begin{desc}
+|\setlist|\texttt{\string<}|<size>|\texttt{\string>}%
+   |[<names>,<levels>]{<keys/values>}|
+\end{desc}
+
+\New{3.7} An extension to |\setlist| described below which adds the
+definitions, but only for the given size (either single or a range).
+The precedence rules for sizes also apply here (so that the order of
+|\setlist|'s are relevant), and size dependent keys as defined by this
+procedure take precedence over the rest of the keys. For example:
+\begingroup
+\makeatletter
+\renewcommand\verbatim@font{\normalfont\ttfamily}
+\begin{verbatim}
+\setlist<-normal>[enumerate]{nosep}
+\end{verbatim}
+\endgroup
+
+However, only a size qualifier is accepted in each |\setlist|.
 
 \section{Cloning the basic lists}
 \label{s.clone}

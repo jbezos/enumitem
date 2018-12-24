@@ -1,4 +1,4 @@
-## Enumitem 3.6.1498
+## Enumitem 3.6.1500
 
 This package provides most of the flexibility you may want to customize
 the three basic list environments (`enumerate`, `itemize` and
@@ -27,4 +27,4 @@ Repository:  https://github.com/jbezos/enumitem
 ________
 Javier Bezos --- http://www.texnia.com
 
-2018/12/22
+2018/12/24
