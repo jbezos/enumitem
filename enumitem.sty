@@ -1,5 +1,5 @@
 %
-% Copyright (C) 2003-2018 Javier Bezos http://www.texnia.com
+% Copyright (C) 2003-2019 Javier Bezos http://www.texnia.com
 %
 % This file may be distributed and/or modified under the conditions of
 % the MIT License. A version can be found at the end of this file.
@@ -10,7 +10,7 @@
 % ~~~~~~~
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{enumitem}[2018/12/24 v3.6.1500 Customized lists]
+\ProvidesPackage{enumitem}[2019/01/14 v3.7 Customized lists]
 
 % Notes
 % ~~~~~
@@ -20,8 +20,6 @@
 % To do:
 % ~~~~~~
 % - ref*, for adding stuff in the same fashion as label*
-% - option ams, to force upshape, but I have to investigate
-% how to do it.
 % - labelled descriptions (ie, label, title, body)
 % - A true nextline (far from trivial and perhaps solved with
 %   labelled descriptions).
@@ -31,6 +29,12 @@
 % - \@enumctr <-> \@listctr?
 % - Define keys with values
 % - Revise @nobreak
+% - bottomsep
+% - \SetEnumerateCounter - must define syntax
+% - option verbose
+% - collect sizes in \SetEnumitemSizes?
+% - series=explicit / resume
+% - package option inlinenew, to define "new" inline lists
 %
 % +=============================+
 % |      EMULATING KEYVAL       |
@@ -121,8 +125,8 @@
 %     safe side, instead of \toks@, etc., a new one is declared.
 % (2) \enit@inbox is the box storing the items in boxed inline
 %     lists.
-% (3) \enit@outerparindent is used to save the outer parindent 
-%     so that it can be used in the key parindent 
+% (3) \enit@outerparindent is used to save the outer parindent
+%     so that it can be used in the key parindent
 % (4) \enit@type has three values: 0 = enum, 1 = item, 2 = desc.
 % (5) \enit@calc stores which dimen is to be computed:
 %     0=labelindent, 1=labelwidth, 2=labelsep, 3=leftmargin,
@@ -179,17 +183,17 @@
 
 \def\enit@checkerror#1#2{%
   \enit@error{Unknown value '#2' for key '#1'}%
-      {See the manual for valid values}} 
+      {See the manual for valid values}}
 
 \def\enit@itemerror{%
   \enit@error{Misplaced \string\item}%
       {Either there is some text before the first\MessageBreak
-       item or the last item has no text}} 
+       item or the last item has no text}}
 
 \def\enit@noserieserror#1{%
   \enit@error{Series '#1' not started}%
       {You are trying to continue a series\MessageBreak
-       which has not been started with 'series'}} 
+       which has not been started with 'series'}}
 
 \def\enit@checkseries#1{%
   \ifcase\enit@resuming
@@ -240,9 +244,6 @@
 \enitkv@key{}{topsep}{%
   \enit@setlength\topsep{#1}}
 
-% \enitkv@key{}{bottomsep}{%
-  % \def\enit@bottomsep{#1}}
-
 \enitkv@key{}{itemsep}{%
   \enit@setlength\itemsep{#1}}
 
@@ -274,10 +275,6 @@
     \fi
     \enit@setlength#1{#3}%
   \fi\fi}
-
-\def\enitkv@enumitem@widest#1{%
-  \expandafter\let\csname enit@cw@\@enumctr\endcsname\relax
-  \@namedef{enit@widest@\@enumctr}##1{#1}}
 
 \def\enitkv@enumitem@widest#1{%
   \ifcase\enit@type  % enumerate
@@ -375,10 +372,10 @@
         {Invalid series name '#1'}%
         {Do not name a series with an existing key}}%
   \else  % series=override
-    \global\@namedef{enitkv@enumitem@#1}%
+    \global\@namedef{enitkv@enumitem@#1}%    with value
       {\enit@error
         {Key '#1' has been overriden by a series}%
-        {Change the series name or deactivate series=override}}%
+        {Change the series name and/or deactivate series=override}}%
     \global\@namedef{enitkv@enumitem@#1@default}{}%
   \fi
   \def\enit@series{#1}}
@@ -522,7 +519,7 @@
     \expandafter\edef\@itemlabel{%
       \enit@noexcs{label\enit@prevlabel}%
       \the\enit@toks}%
-    \advance\enit@depth\@ne  
+    \advance\enit@depth\@ne
   \fi
   \def\enit@ref{\expandafter\enit@reflabel\@itemlabel\z@}}
 
@@ -559,11 +556,11 @@
 % \enit@elt{widest}\count\@count\enit@sc@@count
 % \enit@elt is either \enit@getwidth or \enit@refstar, defined
 % below
-% The current implementation is sub-optimal -- labels are stored in 
+% The current implementation is sub-optimal -- labels are stored in
 % labellist, counters defined again when processing labels, and
 % modifying it is almost impossible.
 
-\let\enit@labellist\@empty 
+\let\enit@labellist\@empty
 
 \newcommand\AddEnumerateCounter{%
   \@ifstar\enit@addcounter@s\enit@addcounter}
@@ -581,8 +578,6 @@
 \def\enit@addcounter@s#1#2#3{%
   \enit@addcounter{#1}{#2}%
     {\@nameuse{enit@sc@\expandafter\@gobble\string#2}{#3}}}
-
-% TODO - \SetEnumerateCounter
 
 % The 5 basic counters:
 
@@ -789,20 +784,13 @@
 %
 % Set keys
 % ========
+%
+% Default definition. Modified below with package option 'sizes'.
 
 \def\enit@setkeys#1{%
   \enit@ifunset{enit@@#1}{}%
-    {\let\enit@c\@empty
-     \enit@ifunset{enit@@#1@@sizes}{}%
-      {\expandafter\let\expandafter\enit@a\csname enit@@#1@@sizes\endcsname
-       \expandafter\enit@try@size@range\expandafter{\enit@a}%
-       \def\enit@keys@sizes{\def\enit@c}%
-       \enit@c
-       \let\enit@keys@sizes\relax}%
-     \expandafter\expandafter\expandafter
-       \enit@setkeys@i
-       \csname enit@@#1\expandafter\endcsname
-       \expandafter,\enit@c\@@}}
+    {\expandafter\expandafter\expandafter
+     \enit@setkeys@i\csname enit@@#1\endcsname\@@}}
 
 % The following is used directly in resumeset:
 
@@ -838,7 +826,7 @@
 
 \def\enit@calcwidth{%
   \ifenit@calcwidest
-    \ifcase\enit@type% ie, enum
+    \ifcase\enit@type   % ie, enum
       \enit@ifunset{enit@cw@\@enumctr}%
         {\@namedef{enit@cv@\@enumctr}{\enit@valueerror\@enumctr}}%
         {\edef\enit@values{%
@@ -856,13 +844,13 @@
         \xdef\enit@a{\labelwidth\the\labelwidth\relax}%
       \endgroup
       \enit@a
-    \or
+    \or                 % ie, item
       \ifx\enit@widest@\relax
         \settowidth\labelwidth{\@itemlabel}%
       \else
         \settowidth\labelwidth{\enit@widest@}%
       \fi
-    \else
+    \else               % ie, desc
       \ifx\enit@widest@\relax
         \settowidth\labelwidth{\@itemlabel}%
       \else
@@ -918,9 +906,9 @@
     \def\value{\enit@refstar@i\value}%
     \let\enit@elt\enit@refstar
     \enit@labellist
-    \protected@xdef\enit@a{{#2}}% Added braces as \ref is in the 
+    \protected@xdef\enit@a{{#2}}% Added braces as \ref is in the
   \endgroup
-  \expandafter\let#1\enit@a}                    % global scope. 
+  \expandafter\let#1\enit@a}                    % global scope.
 
 % Preliminary settings and default values
 % =======================================
@@ -931,7 +919,14 @@
   \edef\enit@prevlabel{#3\romannumeral#2}%
   \advance#2\@ne}
 
+\newcount\enit@count@id
+
+\def\enit@tagid{%
+  \global\advance\enit@count@id\@ne
+  \edef\EnumitemId{\number\enit@count@id}}
+
 \def\enit@preset#1#2#3{%
+   \enit@tagid
    \enit@sepfrommarginfalse
    \enit@calcwidestfalse
    \let\enit@widest@\relax
@@ -1001,7 +996,7 @@
 % ================================
 % The following code is based on LaTeX (\DeclareFontShape). Only the
 % code for <> is preserved (no functions), and a default value can be
-% set before the first <>. In addition, here single values take 
+% set before the first <>. In addition, here single values take
 % precedende over ranges. The original work is by the LaTeX Team,
 % under license LPPL.
 
@@ -1074,12 +1069,10 @@
 
 % This ends the code adapted from latex (under LPPL).
 
-% TODO - \setlist<size>[opt]{..}
-
 \def\SetEnumitemSize#1#2{%
   {\let\selectfont\relax
    #2%
-   \expandafter\xdef\csname enit@sizefor@#1\endcsname{\f@size}}}   
+   \expandafter\xdef\csname enit@sizefor@#1\endcsname{\f@size}}}
 
 \SetEnumitemSize{script}\scriptsize
 \SetEnumitemSize{tiny}\tiny
@@ -1090,7 +1083,7 @@
 \SetEnumitemSize{Large}\Large
 \SetEnumitemSize{LARGE}\LARGE
 \SetEnumitemSize{huge}\huge
-\SetEnumitemSize{Huge}\Huge   
+\SetEnumitemSize{Huge}\Huge
 
 % +=============================+
 % |         LIST TYPES          |
@@ -1334,7 +1327,7 @@
   \setbox\enit@inbox\hbox\bgroup\color@begingroup
     \let\item\enit@endinbox
     \hskip1sp % in case the first thing is \label
-    \ignorespaces} 
+    \ignorespaces}
 
 % Pause item
 % ----------
@@ -1410,7 +1403,7 @@
       \csname\@itemitem\endcsname
        {\let\enit@calc\z@
         \def\makelabel##1{\enit@align{\enit@format{##1}}}%
-        \enit@preset{#2}{#1}{#4}% 
+        \enit@preset{#2}{#1}{#4}%
         \enit@calcleft
         \enit@before}%
     \enit@keyfirst
@@ -1474,28 +1467,16 @@
   \parsep\parskip
   \csname @list\romannumeral\the\@listdepth\endcsname
   \@nmbrlistfalse
+  \enit@tagid
   \enit@setglobalkeys % ie, list and list<num>
   \enit@setkeys{trivlist}%
   \enit@setkeys{trivlist\romannumeral\@listdepth}%
-  \enit@setkeys{\@currenvir}%
-  \enit@setkeys{\@currenvir\romannumeral\@listdepth}%
   \@trivlist
   \labelwidth\z@
   \leftmargin\z@
   \itemindent\z@
   \let\@itemlabel\@empty
   \def\makelabel##1{##1}}
-
-% Let's recognize also the standard trivlists (except theorems)
-
-\let\enitdp@quote\@empty
-\let\enitdp@quotation\@empty
-\let\enitdp@verse\@empty
-\let\enitdp@thebibliography\@empty
-\let\enitdp@center\@empty
-\let\enitdp@flushleft\@empty
-\let\enitdp@flushright\@empty
-\let\enitdp@tabbing\@empty
 
 % Description styles
 % ==================
@@ -1543,7 +1524,7 @@
        \fi}%
       \unhbox\@labels
       \skip@\lastskip % Save last \labelsep
-      \unskip % Remove it 
+      \unskip % Remove it
       \enit@lblpenalty % Restore it, after penalty
     \fi
     \if@nobreak
@@ -1600,20 +1581,25 @@
         \expandafter{\enit@b,#4}%
     \fi
   \else
-    \enit@ifunset{enit@@#1\romannumeral\c@enit@cnt}%
-      {\expandafter\let
-       \csname enit@@#1\romannumeral\c@enit@cnt\endcsname\@empty}%
-      {}%
-    \expandafter\let\expandafter\enit@b
-      \csname enit@@#1\romannumeral\c@enit@cnt @@sizes\endcsname
-    \ifx\enit@b\relax
-      \let\enit@b\@empty
+    \ifcase#3%
+      \enit@ifunset{enit@@#1\romannumeral\c@enit@cnt}%
+        {\expandafter\let
+         \csname enit@@#1\romannumeral\c@enit@cnt\endcsname\@empty}%
+        {}%
+      \expandafter\let\expandafter\enit@b
+        \csname enit@@#1\romannumeral\c@enit@cnt @@sizes\endcsname
+      \ifx\enit@b\relax
+        \let\enit@b\@empty
+      \fi
+      \toks@\expandafter{\enit@b}%
+      \edef\enit@b{\the\toks@\enit@forsize\enit@keys@sizes}%
+      \expandafter\def
+        \csname enit@@#1\romannumeral\c@enit@cnt @@sizes\expandafter\endcsname
+        \expandafter{\enit@b{#4}}%
+    \else
+      \enit@error{* and \string<\string> are not compatible}%
+        {Use either * or angles, but not both.}%
     \fi
-    \toks@\expandafter{\enit@b}%
-    \edef\enit@b{\the\toks@\enit@forsize\enit@keys@sizes}%
-    \expandafter\def
-      \csname enit@@#1\romannumeral\c@enit@cnt @@sizes\expandafter\endcsname
-      \expandafter{\enit@b{#4}}%
   \fi}
 
 % TODO: more robust tests (catch wrong key names, but not easy)
@@ -1634,9 +1620,13 @@
     {\enit@setlist@q#1}%
     {\let\enit@forsize\@empty\enit@setlist@n#1}}
 
+% Default definitions. Modified below with option 'sizes':
+
 \def\enit@setlist@q#1<#2>{%
-  \def\enit@forsize{<#2>}%
-  \enit@setlist@n#1}
+  \enit@error
+    {Activate this feature with options 'sizes'}%
+    {Size dependent setting with \string<\string> must be\MessageBreak
+     explicitly activated with the package option 'sizes'}}
 
 \def\enit@setlist@n#1{%
   \@ifnextchar[{\enit@setlist@x#1}{\enit@setlist@i#1\@empty}}
@@ -1753,9 +1743,6 @@
 % |       PACKAGE OPTIONS       |
 % +=============================+
 
-% TODO - series=override
-%      - series=explicit / resume
-
 \newif\ifenit@loadonly
 
 \DeclareOption{ignoredisplayed}{\let\enit@trivlist\trivlist}
@@ -1788,10 +1775,26 @@
      {\@nameuse{enit@enddescription*}}}
 
 \let\enit@setlength\setlength
-\DeclareOption{sizes}     
+\DeclareOption{sizes}
   {\def\enit@setlength#1#2{%
      \enit@try@size@range{#2}%  Returns \enit@c
-     \setlength#1{\enit@c}}}
+     \setlength#1{\enit@c}}%
+   \def\enit@setkeys#1{%
+     \enit@ifunset{enit@@#1}{}%
+       {\let\enit@c\@empty
+        \enit@ifunset{enit@@#1@@sizes}{}%
+          {\expandafter\let\expandafter\enit@a\csname enit@@#1@@sizes\endcsname
+           \expandafter\enit@try@size@range\expandafter{\enit@a}%
+           \def\enit@keys@sizes{\def\enit@c}%
+           \enit@c
+           \let\enit@keys@sizes\relax}%
+        \expandafter\expandafter\expandafter
+          \enit@setkeys@i
+          \csname enit@@#1\expandafter\endcsname
+          \expandafter,\enit@c\@@}}%
+   \def\enit@setlist@q#1<#2>{%
+     \def\enit@forsize{<#2>}%
+     \enit@setlist@n#1}}
 
 \chardef\enit@seriesopt\z@
 \DeclareOption{series=override}{\chardef\enit@seriesopt\tw@}
@@ -1837,19 +1840,20 @@
             \hskip-\leftmargin
             \hskip\labelindent
             \vrule width -\labelindent height 6pt depth -5pt
-            \hskip\labelindent            
+            \hskip\labelindent
           \else
             \hskip-\labelsep
             \hskip-\labelwidth
             \hskip-\labelindent
-            \vrule width \labelindent height 6pt depth -4pt           
+            \vrule width \labelindent height 6pt depth -4pt
           \fi
           \vrule width \labelwidth height 4pt depth -2pt
           \vrule width \labelsep height 2pt}%
   \else
-  \enit@error
-     {\string\DrawEnumitemLabel\space must be used in vertical mode}%
-     {Very likely, just inserting a blank line before will fix it}}
+    \enit@error
+       {\string\DrawEnumitemLabel\space must be used in vertical mode}%
+       {Very likely, just inserting a blank line before will fix it}%
+  \fi}
 
 % TODO -  option 'verbose'
 
@@ -1857,8 +1861,13 @@
 % |        TWO-PASS TOOLS       |
 % +=============================+
 
-% TODO - downstep
-% TODO - autowidest
+% TODO - Not for the moment, because both tools would require to take
+% into account series and resume, which is not simple. Also, are they
+% applied to all lists, by type, by level, by name, etc.? Document how
+% to do it in at least the simplest cases.
+%
+% - reverse counting
+% - automatic widest, based on existing labels.
 
 \endinput
 

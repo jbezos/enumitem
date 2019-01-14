@@ -1,4 +1,4 @@
-## Enumitem 3.6.1500
+## Enumitem 3.7
 
 This package provides most of the flexibility you may want to customize
 the three basic list environments (`enumerate`, `itemize` and
@@ -8,6 +8,12 @@ syntax.
 ### Latest changes
 
 ```
+3.7  2019-01-14
+   - Option series=override, to overcome some backwards
+     incompatibilities.
+   - Extension to \setlist for sizes (\setlist<size>)
+   - \SetEnumitemSize, for size dependent settings.
+   - \EnumitemId, with a unique numeric identifier for eash list.
 3.6  2018-11-30
    - New key 'left', for fast, tab-like positioning of the label.
    - The key 'widest' now works with 'itemize' and 'description'.
@@ -27,4 +33,4 @@ Repository:  https://github.com/jbezos/enumitem
 ________
 Javier Bezos --- http://www.texnia.com
 
-2018/12/24
+2019/01/14

@@ -1,5 +1,5 @@
 %
-% Copyright (C) 2003-2018 Javier Bezos http://www.texnia.com
+% Copyright (C) 2003-2019 Javier Bezos http://www.texnia.com
 %
 % This file may be distributed and/or modified under the conditions of
 % the MIT License. A version can be found at the end of this file.
@@ -56,7 +56,7 @@
 suggestions go to \href{http://www.texnia.com/enumitem.html}%
 {\texttt{http://www.texnia.com/enumitem.html}}.}}
 
-\date{Version 3.6.1500\\2018/12/24}
+\date{Version 3.7\\2019/01/14}
 
 \IfFileExists{enumitem.sty}{\usepackage{enumitem}}{}
 
@@ -83,8 +83,15 @@ suggestions go to \href{http://www.texnia.com/enumitem.html}%
   with \New{X.X}\hspace{-.5em}. The most recent features could be still
   unstable. Please, report any issues you find on
   \texttt{https://github.com/jbezos/enumitem/issues}, which is better
-  than just complaining on an e-mail list or a web forum.
+  than just complaining on an e-mail list or a web forum. Feel free to
+  fork it and make pull requests.
 \end{note}
+
+\begin{warning}
+  Version 3.6 introduced two new keys: |left| and |first|. If your
+  documents define some series with these names, an error is raised.
+  Just rename them, or set the package option |series=override|.
+\end{warning}
 
 \section{Introduction}
 
@@ -114,15 +121,15 @@ resuming.
 \end{itemize}
 
 In the interface a sort of ``inheritance'' is used. You can set
-globally the behavior of lists and then override several parameters
-of, say, |enumerate| and then in turn override a few parameters of a
+globally the behavior of lists and then override several parameters of,
+say, |enumerate| and then in turn override a few parameters in a
 particular instance. The values will be searched in the hierarchy.
 
 The package extends the syntax of the lists to allow an optional
 argument where a set of parameters in the form |key=value| are
-available. These keys are equivalent to the well known list parameters
--- please, see a \LaTeX{} manual for a description of them. Next
-sections explains the extensions provided by |enumitem|.
+available. These keys are equivalent to the well known list parameters.
+Please, see a \LaTeX{} manual for a description of them. Next sections
+explains the extensions provided by |enumitem|.
 \begin{itemize}
 \item
 Vertical spacing:
@@ -149,7 +156,7 @@ Horizontal spacing:
 \begin{example}
   A straightforward example is:
 \begin{verbatim}
-\begin{itemize}[itemsep=1ex,leftmargin=1cm]
+\begin{itemize}[itemsep=1ex, leftmargin=1cm]
 \end{verbatim}
 \end{example}
 
@@ -197,6 +204,12 @@ label:
 \item To use the three basic list in line: just add the package option 
 |inline| and then the environments |enumerate*|, |itemize*| and 
 |description*|.
+
+\item To set a numeric label with parenthesis, but a cross-reference
+without them:
+\begin{verbatim}
+\begin{enumerate}[label=(\arabic*), ref=\arabic*]
+\end{verbatim}
 
 \end{itemize}
 
@@ -281,7 +294,7 @@ By default, |label| sets also the form of cross references and
 levels), but you can define a different format with this key.  For
 example, to remove the right parenthesis:
 \begin{verbatim}
-\begin{enumerate}[label=\emph{\alph*}),ref=\emph{\alph*}]
+\begin{enumerate}[label=\emph{\alph*}), ref=\emph{\alph*}]
 \end{verbatim}
 
 \begin{note}
@@ -324,11 +337,13 @@ example, to remove the right parenthesis:
 |font=<commands>|\qquad|format=<commands>|
 \end{desc}
 
-Sets the label font.  Useful when the label is changed with the
-optional argument of |\item| and in \texttt{description}.  The last
-command in |<commands>| can take an argument with the item label.  In
+Sets the label font. Useful when the label is changed with the optional
+argument of |\item| and in \texttt{description}. The last command in
+|<commands>| can take an argument with the item label. In
 \texttt{description} class setting are in force, so you may want begin
-with |\normalfont|. A synonymous is \texttt{format}.
+with |\normalfont|. A synonymous is \texttt{format}. Actually, this key
+may be used for any stuff to be executed at each |\item|, just before the
+label.
 
 \begin{desc}
 |align=left|\qquad |align=right|\qquad |align=parleft|
@@ -486,9 +501,10 @@ left margin (the ``start of text'') is computed with the |labelsep|.
 
 Sets which value is to be computed from the others. The default is
 |labelindent=!|, but note some keys set another value (|wide| and
-description |style|s). Computations are done after \textit{all}
-keys has been read. Explicit values are not lost, and so with the
-following hierarchical settings: \begin{verbatim}
+description |style|s). Computations are done after \textit{all} keys
+has been read. Explicit values are not lost, and so with the following
+hierarchical settings:
+\begin{verbatim}
 leftmargin=2em
 labelindent=1em,leftmargin=!
 labelindent=!
@@ -513,10 +529,13 @@ Examples are:
 \begin{verbatim}
 \begin{itemize}[label=\textbullet, leftmargin=*]
 \begin{enumerate}[label=\roman*), leftmargin=*, widest=iii]
-\begin{itemize}[label=\textbullet,
-                leftmargin=2pc, labelsep=*]
-\begin{enumerate}[label=\arabic*., leftmargin=2\parindent, 
-                  labelindent=\parindent, labelsep=*]
+\begin{itemize}[label      = \textbullet,
+                leftmargin = 2pc,
+                labelsep   = *]
+\begin{enumerate}[label       = \arabic*.,
+                  labelindent = \parindent,
+                  leftmargin  = 2\parindent, 
+                  labelsep    = *]
 \end{verbatim}
 
 The most useful are |labelsep=*| and |leftmargin=*|. With the former
@@ -548,7 +567,7 @@ overrides the default value for the widest printed counter. Sometimes,
 if lists are not very long, a value of |a| for |\alph| is more sensible
 than the default |m|:
 \begin{verbatim}
-\begin{enumerate}[leftmargin=*,widest=a] % Assume standard 2nd level
+\begin{enumerate}[leftmargin=*, widest=a] % Assume standard 2nd level
 \end{verbatim}
 With no value, the default is restored. With |widest*|, the string is 
 built using |<integer>| as the value of the counter (e.g., with 
@@ -596,14 +615,14 @@ the current list and not from that in the enclosing list/text.
   while the item body is indented depending on the label and a fixed
   |labelsep|:
 \begin{verbatim}
-labelindent=\parindent,
-leftmargin=*
+labelindent = \parindent,
+leftmargin  = *
 \end{verbatim}
   A fairly frequent variant is aligning the label with the surrounding
   text (remember |labelindent| is |0pt| by default if it is not the
   computed parameter):
 \begin{verbatim}
-leftmargin=*
+leftmargin = *
 \end{verbatim}
   The former looks better in the first level while the latter seems
   preferable in subsequent ones. That can be easily set with
@@ -618,7 +637,7 @@ leftmargin=*
   |\parindent|. In this case (remember |labelindent| is the computed
   parameter if not set):
 \begin{verbatim}
-leftmargin=\parindent
+leftmargin = \parindent
 \end{verbatim}
 \end{example}
 
@@ -626,15 +645,15 @@ leftmargin=\parindent
   A third pattern would be the label aligned with |\parindent|,
   and the item body with |2\parindent|:
 \begin{verbatim}
-labelindent=\parindent,
-leftmargin=2\parindent,
-itemsep=*
+labelindent = \parindent, 
+leftmargin  = 2\parindent, 
+itemsep     = *
 \end{verbatim}
   Again, a variant would be the label aligned with the surrounding
   text, and the item body with |\parindent|:
 \begin{verbatim}
-leftmargin=\parindent,
-itemsep=*
+leftmargin = \parindent,
+itemsep    = *
 \end{verbatim}
 \end{example}
 
@@ -683,7 +702,7 @@ taken from the list previous to the first one, except for
 \begin{example}
   For example:
 \begin{verbatim}
-\begin{enumerate}[resume*,start=1] % or [start=1,resume*]
+\begin{enumerate}[resume*, start=1] % or [start=1, resume*]
 \end{verbatim}
   uses the keys in the previous \texttt{enumerate}, but restarts the
   counter.  
@@ -715,15 +734,15 @@ alternative to |resume*=<series>|.
 \begin{example}
   Consider:
 \begin{verbatim}
-\begin{enumerate}[label=\arabic*(a),leftmargin=1cm,series=l_after]
+\begin{enumerate}[label=\arabic*(a), leftmargin=1cm, series=l_after]
 \item A
 \item B
 \end{enumerate}
 \end{verbatim}
   You get: 1(a)  2(a). You can continue with:
 \begin{verbatim}
-\begin{enumerate}[label=\arabic*(b),resume*=l_after]
-                 % or [label=\arabic*(b),l_after]
+\begin{enumerate}[label=\arabic*(b), resume*=l_after]
+                 % or [label=\arabic*(b), l_after]
 \item A
 \item B
 \end{enumerate}
@@ -769,6 +788,9 @@ end of the list, respectively.  Please, refer to your \LaTeX{} or
 \TeX{} manual about how penalties control page breaks.  Unlike other
 parameters, when a list starts their values are not reset to the
 default, thus they apply to the child lists.
+
+\subsection{Injecting code}
+
 \begin{desc}
 |before=<code>| \qquad |before*=<code>|
 \end{desc}
@@ -785,7 +807,7 @@ and you can access and manipulate the list parameters.
 \begin{example}
   To have both margins (left and right) set to the widest label:
 \begin{verbatim}
-\setlist{leftmargin=*,before=\setlength{\rightmargin}{\leftmargin}}
+\setlist{leftmargin=*, before=\setlength{\rightmargin}{\leftmargin}}
 \end{verbatim}
 \end{example}
 
@@ -809,6 +831,61 @@ is the same as
 <code>
 \end{verbatim}
 With it you may insert, for example, an |\item|.
+
+\begin{desc}
+|\EnumitemId|
+\end{desc}
+
+To help in some tasks, a unique numeric identifier is assigned to each
+list, returned by |\EnumitemId|.
+
+\begin{example}
+  Here is an example of how to combine a |\label| with |\EnumitemId|,
+  and |after| to automatically set the width of the list label to the
+  widest one (provided the ref is the same as the label):\footnote{See
+  \texttt{https://tex.stackexchange.com/questions/29322/%
+  how-to-make-enumerate-items-align-at-left-margin}.}
+\begin{verbatim}
+\SetEnumitemKey{widestlabel}
+  {labelwidth = \widthof{\ref{enum-\EnumitemId}},
+   after      = \label{enum-\EnumitemId}}
+\end{verbatim}
+Then just use the key |widestlabel|.
+\end{example}
+
+\begin{example}
+  Reverse counting is also doable, but somewhat trickier, and we need
+  some ``external'' help. Here is a possible solution, but not the
+  only one (and very likely not even the best -- for example, |start|
+  is in fact no-op).
+
+\begin{verbatim}
+\usepackage{calc,cleveref,crossreftools}
+\crtrefundefinedtext{0}
+
+\newcounter{revcount}
+\newcommand\revcounter[1]{%
+  \setcounter{revcount}{1+\crtcrefnumber{enum-\EnumitemId}-\value{#1}}}
+\AddEnumerateCounter\revcounter\revcounter{} % the 2nd is dummy
+
+\SetEnumitemKey{revarabic}
+  {label = \revcounter*(\arabic{revcount}),
+   ref   = (\arabic{revcount}),
+   after = \label{enum-\EnumitemId}}
+\end{verbatim}
+  Note |ref| must be set separately, because |\revcounter|
+  is not expandable.
+\end{example}
+
+\begin{example}
+  With |first| you can define your own environments for displayed
+  material. A trivial example is:
+\begin{verbatim}
+\newlist{letter}{itemize}{1}
+\setlist[letter]{first=\item[]\itshape, rightmargin=\leftmargin}
+\end{verbatim}
+Here there is no need for a |label|, because it is not used.
+\end{example}
 
 \subsection{Description styles}
 
@@ -913,6 +990,8 @@ example:
 ...
 \end{enumerate}
 \end{verbatim}
+You may want to set |ref|, too, if different from the label.
+
 Although perhaps not so useful, you can omit |label=| in the
 itemize environment under similar conditions, too:
 \begin{verbatim}
@@ -956,7 +1035,7 @@ defined can then be used like the others.
 \begin{example}
   With
 \begin{verbatim}
-\SetEnumitemKey{midsep}{topsep=3pt,partopsep=0pt}
+\SetEnumitemKey{midsep}{topsep=3pt, partopsep=0pt}
 \end{verbatim}
   you may write
 \begin{verbatim}
@@ -968,23 +1047,22 @@ defined can then be used like the others.
   Another example is multicolumn lists, with \textsf{multicol}:
 \begin{verbatim}
 \SetEnumitemKey{twocol}{
-  itemsep=1\itemsep,
-  parsep=1\parsep,
-  before=\raggedcolumns\begin{multicols}{2},
-  after=\end{multicols}}
+  itemsep = 1\itemsep,
+  parsep  = 1\parsep,
+  before  = \raggedcolumns\begin{multicols}{2},
+  after   = \end{multicols}}
 \end{verbatim}
   Here, the settings for \texttt{itemsep} and \texttt{parsep} kill the
-  stretch and shrink parts.  Of course, you may want to define a
-  new list.
+  stretch and shrink parts, which in this case improves the result. Of
+  course, you may want to define a new list.
 \end{example}
 
 \begin{warning}
   The package may introduce new keys in the future, so
   |\SetEnumitemKey| is a potential source of forward incompatibilities.
   However, it's safe using a non-letter character other than hyphen or
-  star in the key name (e.g., |:name| or |2_col|), as well as
-  uppercase letters and digits, because \textsf{enumitem} will never
-  use them.
+  star in the key name (e.g., |:name| or |2_col|), as well as uppercase
+  letters and digits, because \textsf{enumitem} will never use them.
 \end{warning}
 
 \begin{desc}
@@ -1000,7 +1078,7 @@ are translated to the actual value.  For example, with:
 \end{verbatim}
 you might say:
 \begin{verbatim}
-\begin{enumerate}[label=numeric,leftmargin=standard]
+\begin{enumerate}[label=numeric, leftmargin=standard]
 \end{verbatim}
 So, you can left to the final design what |label=numeric| means.
 
@@ -1008,20 +1086,20 @@ So, you can left to the final design what |label=numeric| means.
 \label{s.inline}
 
 Inline lists are ``horizontal'' lists set as ordinary text inside a
-paragraph.  With this package you can create inline lists, as
-explained below, with |\newlist|, which have their own labels and
-counters.  However, very often inline versions of standard lists,
-with the same labeling schema, will be enough -- the package option
-|inline| does that.
+paragraph. With this package you can create inline lists, as explained
+below, with |\newlist|, which have their own labels and counters.
+However, very often inline versions of standard lists, with the same
+labeling schema, will be enough -- the package option |inline| does
+that.
 
 \begin{warning}
   Items are boxed, so floats are lost and nested lists are not allowed
   (remember many displayed elements are defined as lists). Display math
   is forbidden too, and due to an optimization done by \TeX{} when
-  building lists, explicit hyphenation may be wrong.\footnote{A Knuthian
-  ``premature optimization''? Who knows, but anyway Lua\TeX{} has
-  removed it, so hyphenation with this engine should be correct.} There
-  was a reason for this default setting, namely, this feature was
+  building lists, explicit hyphenation may be wrong.\footnote{A
+  Knuthian ``premature optimization''? Who knows, but anyway Lua\TeX{}
+  has removed it, so hyphenation with this engine should be correct.}
+  There was a reason for this default setting, namely, this feature was
   mainly devised for short items (a few words), and the parameter
   |itemjoin*| could be useful for logical markup. To overcome these
   limitations, you may set |mode=unboxed|, described below.
@@ -1117,10 +1195,12 @@ this package, and those redefined by this package or defined with
 \setlist[itemize]{leftmargin=*}
 \setlist[itemize,1]{label=$\triangleleft$}
 \setlist[enumerate]{labelsep=*, leftmargin=1.5pc}
-\setlist[enumerate,1]{label=\arabic*., ref=\arabic*}
-\setlist[enumerate,2]{label=\emph{\alph*}),
-                      ref=\theenumi.\emph{\alph*}}
-\setlist[enumerate,3]{label=\roman*), ref=\theenumii.\roman*}
+\setlist[enumerate,1]{label = \arabic*.,
+                      ref   = \arabic*}
+\setlist[enumerate,2]{label = \emph{\alph*}),
+                      ref   = \theenumi.\emph{\alph*}}
+\setlist[enumerate,3]{label = \roman*),
+                      ref   = \theenumii.\roman*}
 \setlist[description]{font=\sffamily\bfseries}
 \end{verbatim}
 These setting are read in the following order: list, list at the
@@ -1153,24 +1233,29 @@ This allows defining lists with the help of loops.
 \end{warning}
 
 \section{Size dependent settings}
+\label{s:sized}
 
-\New{3.6} The following package option is required for making use of
-this feature.
+\New{3.6} For settings depending on the font size, in most cases all
+you need are relative units like |ex| or |em|. Sometimes, you may want
+discrete steps, and a special syntax allows them.
+
+The following package option is required for making use of this
+feature.
 
 \begin{desc}
 |sizes| (package option)
 \end{desc}
 
 Lengths can contain size-based settings as follows (the value before
-the first $<$ is a default).% TODO -- An alternative |\setlist<size>|.
+the first \texttt{<} is a default).
 \begingroup
 \makeatletter
 \renewcommand\verbatim@font{\normalfont\ttfamily}
 \begin{verbatim}
 \setlist{
-  topsep=     20pt <-10> 6pt          <10-> 40pt,
-  leftmargin=      <-10> 0cm <10> 1cm <10-> 2cm ,
-  rightmargin=     <-10> 0cm <10> 1cm <10-> 2cm ,
+  topsep      = 20pt <-10> 6pt          <10-> 40pt,
+  leftmargin  =      <-10> 0cm <10> 1cm <10-> 2cm ,
+  rightmargin =      <-10> 0cm <10> 1cm <10-> 2cm ,
   }
 \end{verbatim}
 \endgroup
@@ -1178,33 +1263,36 @@ the first $<$ is a default).% TODO -- An alternative |\setlist<size>|.
 Names are accepted, too: |script|, |tiny|, |footnote|, |small|,
 |normal|, |large|, |Large|, |LARGE|, |huge|, |Huge| (ie, remove `size'
 from the \LaTeX{} name if necessary). For example:
-% TODO - |\SetEnumitemSizes| to configure it.
 \begingroup
 \makeatletter
 \renewcommand\verbatim@font{\normalfont\ttfamily}
 \begin{verbatim}
 \setlist{
-  topsep=     20pt <-normal> 6pt              <normal-> 40pt,
-  leftmargin=      <-normal> 0cm <normal> 1cm <normal-> 2cm ,
-  rightmargin=     <-normal> 0cm <normal> 1cm <normal-> 2cm ,
+  topsep      = 20pt <-normal> 6pt              <normal-> 40pt,
+  leftmargin  =      <-normal> 0cm <normal> 1cm <normal-> 2cm ,
+  rightmargin =      <-normal> 0cm <normal> 1cm <normal-> 2cm ,
   }
 \end{verbatim}
 \endgroup
 
-Single values take precedence over ranges. In ranges, the last match
-wins. The range |a-b| is $a \le \mbox{size} < b$ (the lower bound is
-included, but not the upper one). These rules allow in the examples
-above the setting for |10| or |normal| in the logical place. Remember
-nominal sizes are not always the real sizes -- for example, with option
-|11pt|, |\normalsize| (and |normal|) is 10.95. You may precede a value
-with several single qualifiers like
+Single values take precedence over ranges (i. e., specific takes
+precedence over generic). In ranges, the last match wins. The range
+|a-b| is $a \le \mbox{size} < b$ (the lower bound is included, but not
+the upper one). These rules allow in the examples above the setting for
+|10| or |normal| in the logical place. Remember nominal sizes are not
+always the real sizes -- for example, with option |11pt|, |\normalsize|
+(and |normal|) is 10.95. You may precede a value with several single
+qualifiers like
 \texttt{<}|small|\texttt{><}|normal|\texttt{>}|12pt|.\footnote{Note
 this syntax follows closely that of \texttt{\string\DeclareFontShape},
-except in the precedence of single values.}
+except in the precedence of single values.} A value before the first
+\texttt{<..>} is considered a default value.
 
-For efficiency reasons, named sizes are assigned only once, when
-\textsf{enumitem} is loaded, in the assumption they are set by the
-class, or a local style loaded previously. 
+\begin{note}
+  For efficiency reasons, named sizes are assigned only once, when
+  \textsf{enumitem} is loaded, in the assumption they are set by the
+  class, or a local style loaded previously.
+\end{note}
 
 \begin{desc}
 |\SetEnumitemSize{<name>}{<selector>}|
@@ -1279,8 +1367,8 @@ label=\arabic{stepsii}.\arabic{stepsi}
 
 \begin{warning}
   For consistency with the counter naming schema in \LaTeX, list levels
-  are also named internally with a roman numeral, ie, |<list>|i,
-  |<list>|ii, |<list>|iii, etc. For this reason (both counter and list
+  are also named internally with a roman numeral, ie, |<list>i|,
+  |<list>ii|, |<list>iii|, etc. For this reason (both counter and list
   names), defining two lists as, say, |books| and |booksi| leads to
   unexpected results (currently without any warning, which should be
   fixed). 
@@ -1313,6 +1401,11 @@ No number (or 0) means ``all levels'' and no name means ``all lists''; no
 optional argument means ``all lists at all levels''.
 
 The starred form |\setlist*| adds the settings to the previous ones.
+You may restrict the additions to a certain font size, as explained in
+section \ref{s:sized}. It must be noted the latter have a higher
+precedence than the starred ones (i. e., settings added for some sizes
+take precedence over settings added for all sizes, so that the most
+specific value for a key is applied).
 
 \begin{desc}
 |\setlistdepth{<integer>}|
@@ -1396,7 +1489,7 @@ because its name is different.
 
 \section{Package options}
 
-Besides |inline|, |ignoredisplayed|, |sizes| and
+Besides |inline|, |ignoredisplayed|, |sizes|, |series=override| and
 |shortlabels|, the following option is available.
 
 \begin{desc}
@@ -1410,11 +1503,11 @@ even redefine the existing ones.
 \section{The trivlist issue}
 
 \LaTeX{} uses a simplified version of |list| named |trivlist| to set
-displayed material, like |center|, |verbatim|, |tabbing|,
-|theorem|, etc., even if conceptually they are not lists.
-Unfortunately, |trivlist| uses the current list settings, which has
-the odd side effect that changing the vertical spacing of lists also
-changes sometimes the spacing in these environments.
+displayed material, like |center|, |tabbing|, |theorem|, etc., even if
+conceptually they are not lists. Unfortunately, |trivlist| uses the
+current list settings, which has the odd side effect that changing the
+vertical spacing of lists also changes sometimes the spacing in these
+environments.
 
 This package modifies |trivlist| so that the default settings for 
 the current level (ie, those set by the corresponding |clo| 
@@ -1435,8 +1528,6 @@ full-fledge |trivlist| formatter.
 If for some reason you do not want to change |trivlist| and preserve
 the original definition, you can use the package option
 |ignoredisplayed|.
-
-% TODO - Document it may be applied to quote, tabbing, etc.
 
 \New{3.6} If, on the other hand, you want to also apply the changes for
 all lists to trivlists, just set the package option |includedisplayed|.
@@ -1720,10 +1811,10 @@ no ha mucho tiempo que viv\'{\i}a un hidalgo de los de
 \hrule
 \vskip6pt
 
-This format in not infrequent at all and a tool for defining them is 
-on the way and at a very advanced stage. It has not been include in 
-version 3.0 because I'm not sure if the proper place is this package 
-or \textsf{titlesec} and it is not stable enough yet.
+% This format in not infrequent at all and a tool for defining them is
+% on the way and at a very advanced stage. It has not been include in
+% version 3.0 because I'm not sure if the proper place is this package
+% or \textsf{titlesec} and it is not stable enough yet.
 
 \subsection{Known issues}
 
