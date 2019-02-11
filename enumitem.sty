@@ -10,7 +10,7 @@
 % ~~~~~~~
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{enumitem}[2019/01/14 v3.7 Customized lists]
+\ProvidesPackage{enumitem}[2019/02/04 v3.8 Customized lists]
 
 % Notes
 % ~~~~~
@@ -1774,7 +1774,7 @@
      {\@nameuse{enit@description*}\enitdp@description{description}\@M{#1}}
      {\@nameuse{enit@enddescription*}}}
 
-\let\enit@setlength\setlength
+\def\enit@setlength{\setlength}
 \DeclareOption{sizes}
   {\def\enit@setlength#1#2{%
      \enit@try@size@range{#2}%  Returns \enit@c
@@ -1838,7 +1838,6 @@
           \hskip\itemindent
           \ifdim\labelindent<\z@
             \hskip-\leftmargin
-            \hskip\labelindent
             \vrule width -\labelindent height 6pt depth -5pt
             \hskip\labelindent
           \else
@@ -1848,7 +1847,12 @@
             \vrule width \labelindent height 6pt depth -4pt
           \fi
           \vrule width \labelwidth height 4pt depth -2pt
-          \vrule width \labelsep height 2pt}%
+          \ifdim\labelsep<\z@
+            \hskip\labelsep
+            \vrule width -\labelsep height 1pt
+          \else
+            \vrule width \labelsep height 2pt
+          \fi}%
   \else
     \enit@error
        {\string\DrawEnumitemLabel\space must be used in vertical mode}%

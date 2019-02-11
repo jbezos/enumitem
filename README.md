@@ -1,4 +1,4 @@
-## Enumitem 3.7
+## Enumitem 3.8
 
 This package provides most of the flexibility you may want to customize
 the three basic list environments (`enumerate`, `itemize` and
@@ -8,6 +8,9 @@ syntax.
 ### Latest changes
 
 ```
+3.8  2019-02-04
+   - Fix - calc stopped working if loaded after.
+   - Improved \DrawEnumitemLabel
 3.7  2019-01-14
    - Option series=override, to overcome some backwards
      incompatibilities.
@@ -33,4 +36,4 @@ Repository:  https://github.com/jbezos/enumitem
 ________
 Javier Bezos --- http://www.texnia.com
 
-2019/01/14
+2019/02/04

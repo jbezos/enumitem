@@ -56,7 +56,7 @@
 suggestions go to \href{http://www.texnia.com/enumitem.html}%
 {\texttt{http://www.texnia.com/enumitem.html}}.}}
 
-\date{Version 3.7\\2019/01/14}
+\date{Version 3.8\\2019/02/04}
 
 \IfFileExists{enumitem.sty}{\usepackage{enumitem}}{}
 
@@ -220,8 +220,8 @@ available in inline lists, where further keys are available (see
 \ref{s.inline}).
 
 \begin{warning}
-  If the value is completely enclosed in braces, they are removed. If
-  you want the braces, they must be duplicated. This is the default
+  If the value is completely enclosed in braces, they are stripped off.
+  If you want the braces, they must be duplicated. This is the default
   behavior of \textsf{keyval}, which \textsf{enumitem} just emulates.
 \end{warning}
 
@@ -435,8 +435,8 @@ takes a negative value.
 can visualize them by writing |\DrawEnumitemLabel| just before the
 first item (or in |first|), which draws 4 rules from top to bottom,
 |leftmargin| (thin), |labelindent| (thick if positive, thin if
-negative), |labelwidth| (thick) and |labelsep| (thick). If 0, a rule is
-not shown.
+negative), |labelwidth| (thick) and |labelsep| (thick if positive, thin
+if negative). If 0, a rule is not shown.
 \end{note}
 
 \begin{desc}
@@ -471,7 +471,10 @@ The five parameters are related in the following way:
 layouts for the label. You may regard it as a sort or ``rule'' with two
 tab stops: the start of the label and the start of the text (both with
 relation to the normal side margin). With only |<labelindent>|, the
-left margin (the ``start of text'') is computed with the |labelsep|.
+left margin (the ``start of text'') is computed with the |labelsep|. It
+internally resorts to |widest|, so the restrictions of the letter with
+relation to |description| also applies here: you might need change the
+computed parameter (eg, |itemindent=*| with |align=left|).
 
 \begin{example}
   Typical settings would be:
@@ -830,14 +833,23 @@ is the same as
 \begin{itemize}
 <code>
 \end{verbatim}
-With it you may insert, for example, an |\item|.
+
+\begin{example}
+  With |first| you can define your own environments for displayed
+  material. A trivial example is:
+\begin{verbatim}
+\newlist{letter}{itemize}{1}
+\setlist[letter]{first=\item[]\itshape, rightmargin=\leftmargin}
+\end{verbatim}
+Here there is no need for a |label|, because it is not used.
+\end{example}
 
 \begin{desc}
 |\EnumitemId|
 \end{desc}
 
-To help in some tasks, a unique numeric identifier is assigned to each
-list, returned by |\EnumitemId|.
+\New{3.7} To help in some tasks, a unique numeric identifier is
+assigned to each list, returned by |\EnumitemId|.
 
 \begin{example}
   Here is an example of how to combine a |\label| with |\EnumitemId|,
@@ -875,16 +887,6 @@ Then just use the key |widestlabel|.
 \end{verbatim}
   Note |ref| must be set separately, because |\revcounter|
   is not expandable.
-\end{example}
-
-\begin{example}
-  With |first| you can define your own environments for displayed
-  material. A trivial example is:
-\begin{verbatim}
-\newlist{letter}{itemize}{1}
-\setlist[letter]{first=\item[]\itshape, rightmargin=\leftmargin}
-\end{verbatim}
-Here there is no need for a |label|, because it is not used.
 \end{example}
 
 \subsection{Description styles}
