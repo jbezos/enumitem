@@ -56,9 +56,10 @@
 suggestions go to \href{http://www.texnia.com/enumitem.html}%
 {\texttt{http://www.texnia.com/enumitem.html}}.}}
 
-\date{Version 3.8\\2019/02/04}
+\date{Version 3.9\\2019/06/20}  %%NB%%
 
 \IfFileExists{enumitem.sty}{\usepackage{enumitem}}{}
+\IfFileExists{layouts.sty}{\usepackage{layouts}}{}
 
 \addtolength{\topmargin}{-3pc}
 \addtolength{\textwidth}{6pc}
@@ -83,8 +84,8 @@ suggestions go to \href{http://www.texnia.com/enumitem.html}%
   with \New{X.X}\hspace{-.5em}. The most recent features could be still
   unstable. Please, report any issues you find on
   \texttt{https://github.com/jbezos/enumitem/issues}, which is better
-  than just complaining on an e-mail list or a web forum. Feel free to
-  fork it and make pull requests.
+  than just complaining on an e-mail list or a web forum. Forking
+  and pull requests are welcome.
 \end{note}
 
 \begin{warning}
@@ -161,8 +162,16 @@ Horizontal spacing:
 \end{example}
 
 \begin{note}
-  A way to see how these parameters work is with the |layout| package
+  A way to see how these parameters work is with the |layouts| package
   (the manual is named |layman.pdf|).
+  \ifx\listdiagram\notundefined\else
+    See figure \ref{f.drawlist}.
+    \begin{figure}
+      \centering
+      \listdiagram
+      \caption{List parameters}\label{f.drawlist}
+    \end{figure}
+  \fi
 \end{note}
 
 \section{Quick reference}
@@ -434,9 +443,9 @@ takes a negative value.
 \New{3.6} If you find these parameters baffling, you are not alone. You
 can visualize them by writing |\DrawEnumitemLabel| just before the
 first item (or in |first|), which draws 4 rules from top to bottom,
-|leftmargin| (thin), |labelindent| (thick if positive, thin if
-negative), |labelwidth| (thick) and |labelsep| (thick if positive, thin
-if negative). If 0, a rule is not shown.
+|labelindent|, |labelwidth|, |labelsep|, |itemindent| (thin if
+positive, thick if negative); the |leftmargin| is marked with two
+vertical rules.
 \end{note}
 
 \begin{desc}
@@ -516,7 +525,7 @@ labelindent=!
 
 \begin{note}
   With |align=right| (the default), |labelindent=!| and |labelwidth=!|
-  behave similarly in practice.
+  behave similarly in practice. 
 \end{note}
 
 \begin{desc}
@@ -558,7 +567,9 @@ always the same within a list, of course).
 \end{note}
 
 \begin{note}
-  |labelwidth=*| and |labelwidth=!| are synonymous.
+  |labelwidth=*| and |labelwidth=!| are synonymous. Use them with care,
+  because they may take negative values, which does not make sense (a
+  warning is shown).
 \end{note}
 
 \begin{desc}
@@ -1594,7 +1605,7 @@ The rule shows |labelindent|.
 
 \noindent\showsep\hskip\parindent En un lugar de la Mancha, de cuyo nombre no quiero acordarme,
 no ha mucho tiempo que viv\'{\i}a un hidalgo de los de
-\begin{enumerate}[leftmargin=*]
+\begin{enumerate}[leftmargin=*]      
 \item lanza en astillero,
 \item adarna antigua,
 \item roc\'{\i}n flaco, y

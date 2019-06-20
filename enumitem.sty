@@ -10,7 +10,7 @@
 % ~~~~~~~
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{enumitem}[2019/02/04 v3.8 Customized lists]
+\ProvidesPackage{enumitem}[2019/06/20 v3.9 Customized lists]  %%NB%%
 
 % Notes
 % ~~~~~
@@ -881,6 +881,13 @@
     \enit@calcwidth
     \advance\itemindent-\dimen@
   \fi}
+  
+\def\enit@negwidth{%
+  \ifdim\labelwidth<\z@
+    \PackageWarning{enumitem}%
+       {Negative labelwidth. This does not make much\MessageBreak
+        sense,}%
+  \fi}
 
 % "Normalizing" labels
 % ====================
@@ -1369,7 +1376,8 @@
        \enit@normlabel\@itemlabel\@itemlabel
        \enit@ref
        \enit@calcleft
-       \enit@before}%
+       \enit@before
+       \enit@negwidth}%
     \enit@keyfirst
   \fi}
 
@@ -1405,7 +1413,8 @@
         \def\makelabel##1{\enit@align{\enit@format{##1}}}%
         \enit@preset{#2}{#1}{#4}%
         \enit@calcleft
-        \enit@before}%
+        \enit@before
+        \enit@negwidth}%
     \enit@keyfirst
   \fi}
 
@@ -1452,7 +1461,8 @@
            \enit@svlabel{\enit@format{##1}}%
            \aftergroup\enit@postlabel
          \fi}%
-       \enit@before}%
+       \enit@before
+       \enit@negwidth}%
      \enit@keyfirst
   \fi}
 
@@ -1830,34 +1840,35 @@
 % |            TOOLS            |
 % +=============================+
 
+\def\enit@drawrule#1#2#3#4{%
+  \rlap{%
+    \ifdim#1>0pt\relax
+      \vrule width #1 height #2 depth -#3\relax
+    \else\ifdim#1=0pt\relax
+      %
+    \else
+      \hskip#1%
+      \vrule width -#1 height #2 depth -#4\relax
+    \fi\fi}}
+  
 \def\DrawEnumitemLabel{%
-  \ifvmode
-    \hbox{\hskip\@totalleftmargin
-          \hskip-\leftmargin
-          \vrule width \leftmargin height 8pt depth -7pt
-          \hskip\itemindent
-          \ifdim\labelindent<\z@
-            \hskip-\leftmargin
-            \vrule width -\labelindent height 6pt depth -5pt
-            \hskip\labelindent
-          \else
-            \hskip-\labelsep
-            \hskip-\labelwidth
-            \hskip-\labelindent
-            \vrule width \labelindent height 6pt depth -4pt
-          \fi
-          \vrule width \labelwidth height 4pt depth -2pt
-          \ifdim\labelsep<\z@
-            \hskip\labelsep
-            \vrule width -\labelsep height 1pt
-          \else
-            \vrule width \labelsep height 2pt
-          \fi}%
-  \else
-    \enit@error
-       {\string\DrawEnumitemLabel\space must be used in vertical mode}%
-       {Very likely, just inserting a blank line before will fix it}%
-  \fi}
+  \begingroup
+    \item[]%
+    \hskip-\labelsep
+    \enit@drawrule\labelsep{4pt}{3pt}{2.3pt}%
+    \hskip-\labelwidth
+    \enit@drawrule\labelwidth{6pt}{5pt}{4.3pt}%
+    \hskip\labelwidth
+    \hskip\labelsep
+    %
+    \hskip-\itemindent
+    \enit@drawrule\itemindent{2pt}{1pt}{.3pt}%
+    \rlap{\vrule height 9pt depth .5pt}%
+    \hskip-\leftmargin
+    \rlap{\vrule height 9pt depth .5pt}%
+    \enit@drawrule\labelindent{8pt}{7pt}{6.5pt}%
+    % \message{\the\labelindent/\the\labelwidth/\the\labelsep/\the\itemindent}%
+  \endgroup} 
 
 % TODO -  option 'verbose'
 
