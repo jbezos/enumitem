@@ -928,8 +928,11 @@ fit in the margin the text continues in the same line. Same as
 |style=unboxed,labelwidth=!|.
 
 \item[|multiline|] The label is placed in a parbox whose width is 
-|leftmargin|, with several lines if 
-necessary. Same as |style=standard,align=parleft,labelwidth=!|.
+|leftmargin|, with several lines if necessary. Same as
+|style=standard,align=parleft,labelwidth=!|. If you modify it, bear in
+mind |align| cannot be set freely (for an internal optimization; in
+particular, a horizontal box doesn’t make sense and can raise an
+error).
 
 \end{description}
 
