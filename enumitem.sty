@@ -176,7 +176,7 @@
        \expandafter\@firstoftwo
      \fi}}
 
-% Miscelaneous errors
+% Miscellaneous errors
 % ===================
 
 \def\enit@error{\PackageError{enumitem}}
@@ -204,7 +204,7 @@
 
 \def\enit@checkseries@m{%
   \ifcase\enit@resuming\else
-    \enit@error{Uncompatible series settings}%
+    \enit@error{Incompatible series settings}%
       {'series' and 'resume*' must not be used\MessageBreak
        at the same time}%
   \fi}
@@ -231,7 +231,7 @@
 %
 % There are 2 keyval groups: enumitem, and enumitem-delayed.
 % The latter is used to make sure a prioritary key is the latest one;
-% eg, ref, so that the ref format set by label is overriden. So, when
+% eg, ref, so that the ref format set by label is overridden. So, when
 % this key is found in enumitem, nothing is done, except the key/value
 % is moved to enumitem-delayed.
 %
@@ -374,7 +374,7 @@
   \else  % series=override
     \global\@namedef{enitkv@enumitem@#1}%    with value
       {\enit@error
-        {Key '#1' has been overriden by a series}%
+        {Key '#1' has been overridden by a series}%
         {Change the series name and/or deactivate series=override}}%
     \global\@namedef{enitkv@enumitem@#1@default}{}%
   \fi
@@ -474,7 +474,7 @@
 % Labels and refs
 % ===============
 
-% Aligment
+% Alignment
 % --------
 
 \enitkv@key{}{align}{%
@@ -525,7 +525,7 @@
 
 % ref is set by label, except if there is an explicit ref in the same
 % hierarchy level. Explicit refs above the current hierarchy level are
-% overriden by label (besides ref), too. Since an explicit ref has
+% overridden by label (besides ref), too. Since an explicit ref has
 % preference, it's delayed.
 
 \enitkv@key{}{ref}{%
@@ -713,7 +713,7 @@
   \expandafter\def\expandafter\enit@keyfirst\expandafter
     {\enit@keyfirst#1}}
 
-% Miscelaneous keys
+% Miscellaneous keys
 % ================
 
 \enitkv@key{}{nolistsep}[true]{%
@@ -999,7 +999,7 @@
   \expandafter\enit@setkeys@i\enit@savekeys\@@
   \let\enitkv@errx\enit@savekverr}
 
-% Handling <> sytax for font sizes
+% Handling <> syntax for font sizes
 % ================================
 % The following code is based on LaTeX (\DeclareFontShape). Only the
 % code for <> is preserved (no functions), and a default value can be
@@ -1492,7 +1492,7 @@
 % ==================
 %
 % the next definition is somewhat tricky because labels are boxed.
-% That's fine when the label is just placed at the begining of a line
+% That's fine when the label is just placed at the beginning of a line
 % of text, but when the box is placed without horizontal material,
 % leading is killed.  So, we need change somehow \box to \unhbox, but
 % I don't want to modify \@item.  The code below presumes \@item has
@@ -1508,7 +1508,7 @@
 % necessary to get proper line breaks (including a \nobreak at the
 % beginning of \enit@align, ie, after the first whatsit, see above).
 % To "pass" the inner group added by color to the box, \enit@postlabel
-% ckecks if the following is }.  ie, \egroup -- if not, the box has
+% checks if the following is }.  ie, \egroup -- if not, the box has
 % not reached yet its end.
 
 \def\enit@postlabel{%
