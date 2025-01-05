@@ -21,7 +21,6 @@
 \definecolor{notes}{rgb}{.75, .3, .3}%
 
 \makeatletter
-\expandafter\def\csname ver@array.sty\endcsname{} % Because it's loaded by eqparbox but breaks the decl environment
 \newenvironment{desc}
   {\if@nobreak
      \vskip-\lastskip
@@ -57,7 +56,7 @@
 suggestions go to \href{http://www.texnia.com/enumitem.html}%
 {\texttt{http://www.texnia.com/enumitem.html}}.}}
 
-\date{Version 3.9\\2019/06/20}
+\date{Version 3.9\\2025/01/05}
 
 \IfFileExists{enumitem.sty}{\usepackage{enumitem}}{}
 \IfFileExists{layouts.sty}{\usepackage{layouts}}{}
@@ -574,7 +573,7 @@ always the same within a list, of course).
 \end{note}
 
 \begin{desc}
-|widest=<string>|\qquad|widest*=<integer>|\qquad|widest|\qquad|autowidest|
+|widest=<string>|\qquad|widest*=<integer>|\qquad|widest|
 \end{desc}
 
 To be used in conjunction with the \texttt{*}-values, if desired. It
@@ -597,9 +596,6 @@ being a number, it is allowed.
 However, since the latter does some tricky formatting inside the label 
 you might need change the computed parameter (eg, |itemindent=*| with 
 |align=left|).
-
-\New{3.X} You can use |autowidest| to have \textsf{enumitem}
-work out the actual widest label for you, however it requires at least two runs of \LaTeX.
 
 \begin{desc}
 |labelsep*=<length>|
@@ -867,7 +863,21 @@ Here there is no need for a |label|, because it is not used.
 assigned to each list, returned by |\EnumitemId|.
 
 \begin{example}
-  Here is an example of reverse counting, but it is somewhat tricky, and we need
+  Here is an example of how to combine a |\label| with |\EnumitemId|,
+  and |after| to automatically set the width of the list label to the
+  widest one (provided the ref is the same as the label):\footnote{See
+  \texttt{https://tex.stackexchange.com/questions/29322/%
+  how-to-make-enumerate-items-align-at-left-margin}.}
+\begin{verbatim}
+\SetEnumitemKey{widestlabel}
+  {labelwidth = \widthof{\ref{enum-\EnumitemId}},
+   after      = \label{enum-\EnumitemId}}
+\end{verbatim}
+Then just use the key |widestlabel|.
+\end{example}
+
+\begin{example}
+  Reverse counting is also doable, but somewhat trickier, and we need
   some ``external'' help. Here is a possible solution, but not the
   only one (and very likely not even the best -- for example, |start|
   is in fact no-op).
