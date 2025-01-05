@@ -21,6 +21,7 @@
 \definecolor{notes}{rgb}{.75, .3, .3}%
 
 \makeatletter
+\expandafter\def\csname ver@array.sty\endcsname{} % Because it's loaded by eqparbox but breaks the decl environment
 \newenvironment{desc}
   {\if@nobreak
      \vskip-\lastskip
@@ -130,7 +131,7 @@ The package extends the syntax of the lists to allow an optional
 argument where a set of parameters in the form |key=value| are
 available. These keys are equivalent to the well known list parameters.
 Please, see a \LaTeX{} manual for a description of them. Next sections
-explains the extensions provided by |enumitem|.
+explain the extensions provided by \textsf{enumitem}.
 \begin{itemize}
 \item
 Vertical spacing:
@@ -210,7 +211,7 @@ label:
 \begin{enumerate}[resume*]
 \end{verbatim}
 
-\item To use the three basic list in line: just add the package option 
+\item To use the three basic lists in line: just add the package option 
 |inline| and then the environments |enumerate*|, |itemize*| and 
 |description*|.
 
@@ -349,8 +350,8 @@ example, to remove the right parenthesis:
 Sets the label font. Useful when the label is changed with the optional
 argument of |\item| and in \texttt{description}. The last command in
 |<commands>| can take an argument with the item label. In
-\texttt{description} class setting are in force, so you may want begin
-with |\normalfont|. A synonymous is \texttt{format}. Actually, this key
+\texttt{description} class setting are in force, so you may want to begin
+with |\normalfont|. A synonym is \texttt{format}. Actually, this key
 may be used for any stuff to be executed at each |\item|, just before the
 label.
 
@@ -425,7 +426,7 @@ a future release.}
 \texttt{leftmargin}
 \end{tabular}
 \end{center}
-Here |labelindent| is a new parameter introduced by \textit{enumitem}, 
+Here |labelindent| is a new parameter introduced by \textsf{enumitem}, 
 described below. The rest are those in standard \LaTeX.
 
 Actually, the layout is more complex because the label box (ie,
@@ -514,7 +515,7 @@ computed parameter (eg, |itemindent=*| with |align=left|).
 Sets which value is to be computed from the others. The default is
 |labelindent=!|, but note some keys set another value (|wide| and
 description |style|s). Computations are done after \textit{all} keys
-has been read. Explicit values are not lost, and so with the following
+have been read. Explicit values are not lost, and so with the following
 hierarchical settings:
 \begin{verbatim}
 leftmargin=2em
@@ -573,7 +574,7 @@ always the same within a list, of course).
 \end{note}
 
 \begin{desc}
-|widest=<string>|\qquad|widest*=<integer>|\qquad|widest|
+|widest=<string>|\qquad|widest*=<integer>|\qquad|widest|\qquad|autowidest|
 \end{desc}
 
 To be used in conjunction with the \texttt{*}-values, if desired. It
@@ -596,6 +597,9 @@ being a number, it is allowed.
 However, since the latter does some tricky formatting inside the label 
 you might need change the computed parameter (eg, |itemindent=*| with 
 |align=left|).
+
+\New{3.X} You can use |autowidest| to have \textsf{enumitem}
+work out the actual widest label for you, however it requires at least two runs of \LaTeX.
 
 \begin{desc}
 |labelsep*=<length>|
@@ -863,21 +867,7 @@ Here there is no need for a |label|, because it is not used.
 assigned to each list, returned by |\EnumitemId|.
 
 \begin{example}
-  Here is an example of how to combine a |\label| with |\EnumitemId|,
-  and |after| to automatically set the width of the list label to the
-  widest one (provided the ref is the same as the label):\footnote{See
-  \texttt{https://tex.stackexchange.com/questions/29322/%
-  how-to-make-enumerate-items-align-at-left-margin}.}
-\begin{verbatim}
-\SetEnumitemKey{widestlabel}
-  {labelwidth = \widthof{\ref{enum-\EnumitemId}},
-   after      = \label{enum-\EnumitemId}}
-\end{verbatim}
-Then just use the key |widestlabel|.
-\end{example}
-
-\begin{example}
-  Reverse counting is also doable, but somewhat trickier, and we need
+  Here is an example of reverse counting, but it is somewhat tricky, and we need
   some ``external'' help. Here is a possible solution, but not the
   only one (and very likely not even the best -- for example, |start|
   is in fact no-op).
@@ -1022,7 +1012,7 @@ itemize environment under similar conditions, too:
 
 With this command, you can define new keys (or redefine them), which is
 particularly useful for enumerate to be adapted to specific
-typographical rules or to extend it for non-Latin scrips. Here
+typographical rules or to extend it for non-Latin scripts. Here
 |<replacement>| contains one of the starred versions of 
 counters.
 
@@ -1913,7 +1903,7 @@ overlap.
 \item |description| did not get the correct list level.
 \item At some point (2.x?) |\value*| stopped working.
 \item (3.1) Unfortunately, \textsf{xkeyval} ``kills'' 
-\textsf{keyval}, so the lattest has been replicated in 
+\textsf{keyval}, so the latest has been replicated in 
 \textsf{enumitem}.
 \item (3.3) Fixes a serious bug -- with |*| neither 
 |itemize| nor |description| worked.

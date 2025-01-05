@@ -12,6 +12,8 @@
 \NeedsTeXFormat{LaTeX2e}
 \ProvidesPackage{enumitem}[2019/06/20 v3.9 Customized lists]
 
+\RequirePackage{eqparbox}% Needed by autowidest
+
 % Notes
 % ~~~~~
 %
@@ -145,6 +147,7 @@
 \newif\ifenit@sepfrommargin
 \newif\ifenit@lblfrommargin
 \newif\ifenit@calcwidest
+\newif\ifenit@autowidest
 \newif\ifenit@nextline
 \newif\ifenit@boxdesc
 
@@ -176,7 +179,7 @@
        \expandafter\@firstoftwo
      \fi}}
 
-% Miscelaneous errors
+% Miscellaneous errors
 % ===================
 
 \def\enit@error{\PackageError{enumitem}}
@@ -204,7 +207,7 @@
 
 \def\enit@checkseries@m{%
   \ifcase\enit@resuming\else
-    \enit@error{Uncompatible series settings}%
+    \enit@error{Incompatible series settings}%
       {'series' and 'resume*' must not be used\MessageBreak
        at the same time}%
   \fi}
@@ -231,7 +234,7 @@
 %
 % There are 2 keyval groups: enumitem, and enumitem-delayed.
 % The latter is used to make sure a prioritary key is the latest one;
-% eg, ref, so that the ref format set by label is overriden. So, when
+% eg, ref, so that the ref format set by label is overridden. So, when
 % this key is found in enumitem, nothing is done, except the key/value
 % is moved to enumitem-delayed.
 %
@@ -277,6 +280,7 @@
   \fi\fi}
 
 \def\enitkv@enumitem@widest#1{%
+  \enit@autowidestfalse% Manually using widest overrides autowidest
   \ifcase\enit@type  % enumerate
     \expandafter\let\csname enit@cw@\@enumctr\endcsname\relax
     \@namedef{enit@widest@\@enumctr}##1{\enit@format{#1}}%
@@ -289,11 +293,33 @@
   \expandafter\let\csname enit@widest@\@enumctr\endcsname\relax}
 
 \enitkv@key{}{widest*}{%
+  \enit@autowidestfalse% Manually using widest* overrides autowidest
   \setcounter{enit@cnt}{#1}%
   \expandafter\edef\csname enit@cw@\@enumctr\endcsname
     {\the\c@enit@cnt}%
   \expandafter\edef\csname enit@widest@\@enumctr\endcsname##1%
     {##1{\the\c@enit@cnt}}}
+
+\enitkv@key{}{autowidest}[]{%
+	% \eqboxwidth gets the widest width of the calls to \eqp@compute@width with the same argument
+	\enitkv@setkeys{enumitem}{widest=\hbox to \eqboxwidth{enit@autowidest@\EnumitemId}{}}
+	\enit@autowidesttrue}
+% \enit@autowidest needs to be called after \makelabel is set up properly
+% (thus it is not called as part of \enit@calcleft since that gets called in the wrong place for descriptions)
+\newcommand\enit@autowidest{%
+	\ifenit@autowidest\ifenit@calcwidest% autowidest only makes sense if used with an =* option
+		\let\enit@makelabel=\makelabel% Save the original \makelabel
+		% Override \makelabel so that it also keeps track of label widths
+		\def\makelabel##1{
+			\savebox\enit@inbox{\enit@makelabel{##1}}% Stop \eqp@compute@width from typseting this twice
+			% \eqp@compute@width will compute the widest width by typesting \usebox\enit@inbox
+			% and then returns \eqp@produce@box{<widest width>}{\usebox\enit@inbox}
+			% \eqp@produce@box is globally defined by each of eqparbox's various \eq commands so it's safe to modify
+			% It's modified below to simply ignored the <widest width>, as this will be handled by the
+			% widest key itself
+			\global\let\eqp@produce@box=\@secondoftwo%
+			\eqp@compute@width{enit@autowidest@\EnumitemId}{\usebox\enit@inbox}}
+	\fi\fi}
 
 \enitkv@key{}{labelindent*}{%
   \enit@lblfrommargintrue
@@ -374,7 +400,7 @@
   \else  % series=override
     \global\@namedef{enitkv@enumitem@#1}%    with value
       {\enit@error
-        {Key '#1' has been overriden by a series}%
+        {Key '#1' has been overridden by a series}%
         {Change the series name and/or deactivate series=override}}%
     \global\@namedef{enitkv@enumitem@#1@default}{}%
   \fi
@@ -474,7 +500,7 @@
 % Labels and refs
 % ===============
 
-% Aligment
+% Alignment
 % --------
 
 \enitkv@key{}{align}{%
@@ -525,7 +551,7 @@
 
 % ref is set by label, except if there is an explicit ref in the same
 % hierarchy level. Explicit refs above the current hierarchy level are
-% overriden by label (besides ref), too. Since an explicit ref has
+% overridden by label (besides ref), too. Since an explicit ref has
 % preference, it's delayed.
 
 \enitkv@key{}{ref}{%
@@ -713,7 +739,7 @@
   \expandafter\def\expandafter\enit@keyfirst\expandafter
     {\enit@keyfirst#1}}
 
-% Miscelaneous keys
+% Miscellaneous keys
 % ================
 
 \enitkv@key{}{nolistsep}[true]{%
@@ -936,6 +962,7 @@
    \enit@tagid
    \enit@sepfrommarginfalse
    \enit@calcwidestfalse
+   \enit@autowidestfalse
    \let\enit@widest@\relax
    \let\enit@resuming\z@
    \let\enit@series\relax
@@ -999,7 +1026,7 @@
   \expandafter\enit@setkeys@i\enit@savekeys\@@
   \let\enitkv@errx\enit@savekverr}
 
-% Handling <> sytax for font sizes
+% Handling <> syntax for font sizes
 % ================================
 % The following code is based on LaTeX (\DeclareFontShape). Only the
 % code for <> is preserved (no functions), and a default value can be
@@ -1376,6 +1403,7 @@
        \enit@normlabel\@itemlabel\@itemlabel
        \enit@ref
        \enit@calcleft
+       \enit@autowidest
        \enit@before
        \enit@negwidth}%
     \enit@keyfirst
@@ -1413,6 +1441,7 @@
         \def\makelabel##1{\enit@align{\enit@format{##1}}}%
         \enit@preset{#2}{#1}{#4}%
         \enit@calcleft
+        \enit@autowidest
         \enit@before
         \enit@negwidth}%
     \enit@keyfirst
@@ -1461,6 +1490,7 @@
            \enit@svlabel{\enit@format{##1}}%
            \aftergroup\enit@postlabel
          \fi}%
+       \enit@autowidest% This needs to go after the \makelabel definition above
        \enit@before
        \enit@negwidth}%
      \enit@keyfirst
@@ -1492,7 +1522,7 @@
 % ==================
 %
 % the next definition is somewhat tricky because labels are boxed.
-% That's fine when the label is just placed at the begining of a line
+% That's fine when the label is just placed at the beginning of a line
 % of text, but when the box is placed without horizontal material,
 % leading is killed.  So, we need change somehow \box to \unhbox, but
 % I don't want to modify \@item.  The code below presumes \@item has
@@ -1508,7 +1538,7 @@
 % necessary to get proper line breaks (including a \nobreak at the
 % beginning of \enit@align, ie, after the first whatsit, see above).
 % To "pass" the inner group added by color to the box, \enit@postlabel
-% ckecks if the following is }.  ie, \egroup -- if not, the box has
+% checks if the following is }.  ie, \egroup -- if not, the box has
 % not reached yet its end.
 
 \def\enit@postlabel{%
