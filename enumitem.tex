@@ -1,5 +1,5 @@
 %
-% Copyright (C) 2003-2019 Javier Bezos http://www.texnia.com
+% Copyright (C) 2003-2025 Javier Bezos http://www.texnia.com
 %
 % This file may be distributed and/or modified under the conditions of
 % the MIT License. A version can be found at the end of this file.
@@ -881,23 +881,26 @@ Then just use the key |widestlabel|.
   some ``external'' help. Here is a possible solution, but not the
   only one (and very likely not even the best -- for example, |start|
   is in fact no-op).
-
 \begin{verbatim}
-\usepackage{calc,cleveref,crossreftools}
-\crtrefundefinedtext{0}
+\newcounter{rev-enumi}   \newcounter{rev-enumii}
+\newcounter{rev-enumiii} \newcounter{rev-enumiv}
 
-\newcounter{revcount}
 \newcommand\revcounter[1]{%
-  \setcounter{revcount}{1+\crtcrefnumber{enum-\EnumitemId}-\value{#1}}}
+  \setcounter{#1}{\value{#1}-2}%
+  \stepcounter{rev-#1}%
+  \gdef\afterrev{%
+    \refstepcounter{rev-#1}%
+    \setcounter{rev-#1}{0}}}
+
 \AddEnumerateCounter\revcounter\revcounter{} % the 2nd is dummy
 
-\SetEnumitemKey{revarabic}
-  {label = \revcounter*(\arabic{revcount}),
-   ref   = (\arabic{revcount}),
-   after = \label{enum-\EnumitemId}}
+\SetEnumitemKey{revRoman}
+  {start  = \getrefnumber{enum-\EnumitemId}-1,
+   label  = (\Roman*)\revcounter*,
+   ref    = (\Roman*),
+   after  = \afterrev
+            \label{enum-\EnumitemId}}
 \end{verbatim}
-  Note |ref| must be set separately, because |\revcounter|
-  is not expandable.
 \end{example}
 
 \subsection{Description styles}
@@ -1110,11 +1113,11 @@ that.
 
 \begin{warning}
   Items are boxed, so floats are lost and nested lists are not allowed
-  (remember many displayed elements are defined as lists). Display math
-  is forbidden too, and due to an optimization done by \TeX{} when
-  building lists, explicit hyphenation may be wrong.\footnote{A
-  Knuthian ``premature optimization''? Who knows, but anyway Lua\TeX{}
-  has removed it, so hyphenation with this engine should be correct.}
+  (remember many displayed elements are defined as lists). Links may
+  point to a wrong place, display math is forbidden, and due to an
+  optimization done by \TeX{} when building lists explicit hyphenation
+  may be wrong.\footnote{A Knuthian ``premature optimization''? Who
+  knows, but anyway with Lua\TeX{} hyphenation should be correct.}
   There was a reason for this default setting, namely, this feature was
   mainly devised for short items (a few words), and the parameter
   |itemjoin*| could be useful for logical markup. To overcome these
