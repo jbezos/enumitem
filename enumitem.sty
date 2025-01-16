@@ -919,6 +919,15 @@
   \else
     \noexpand#1{#2}%
   \fi}%
+  
+% Suggested by @muzimuzhi, amended. See Gh36.
+
+\def\enit@refstar@ii#1#2{%
+  \if*#2\@empty
+    \noexpand\the\noexpand#1{\@enumctr}%
+  \else
+    \noexpand\the\noexpand#1{#2}%
+  \fi}
 
 \def\enit@refstar#1#2#3#4{%
   \def#2{\enit@refstar@i#2}%
@@ -926,12 +935,13 @@
 
 \def\enit@normlabel#1#2{%
   \begingroup
-    \def\value{\enit@refstar@i\value}%
+    \def\value{\enit@refstar@ii\value}%
     \let\enit@elt\enit@refstar
     \enit@labellist
-    \protected@xdef\enit@a{{#2}}% Added braces as \ref is in the
+    % Added braces as \ref is in the global scope:
+    \protected@xdef\enit@a{{#2}}%
   \endgroup
-  \expandafter\let#1\enit@a}                    % global scope.
+  \expandafter\let#1\enit@a}   
 
 % Preliminary settings and default values
 % =======================================
