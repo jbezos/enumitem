@@ -10,7 +10,7 @@
 % ~~~~~~~
 
 \NeedsTeXFormat{LaTeX2e}
-\ProvidesPackage{enumitem}[2025/01/19 v3.10 Customized lists]
+\ProvidesPackage{enumitem}[2025/02/06 v3.11 Customized lists]
 
 % Notes
 % ~~~~~
@@ -223,12 +223,6 @@
          \csname @list\romannumeral\the\count@\endcsname}{}%
   \fi}
   
-\def\enit@nolabelenum#1#2{%
-  \enit@error{Label undefined}%
-      {The current class doesn't define some labels\MessageBreak
-       for 'enumerate'. You have to do it yourself, as\MessageBreak
-       explained in the manual.}}
-
 % +=============================+
 % |            KEYS             |
 % +=============================+
@@ -1397,11 +1391,6 @@
       \csname label\@enumctr\endcsname
       {\usecounter\@enumctr
        \let\enit@calc\z@
-       \expandafter\ifx\expandafter\@undefined\@itemlabel
-         \enit@nolabelenum
-       \else\expandafter\ifx\expandafter\relax\@itemlabel
-         \enit@nolabelenum
-       \fi\fi
        \def\makelabel##1{\enit@align{\enit@format{##1}}}%
        \enit@preset{#2}{#1}{#4}%
        \enit@normlabel\@itemlabel\@itemlabel

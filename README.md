@@ -1,4 +1,4 @@
-## Enumitem 3.10
+## Enumitem 3.11
 
 This package provides most of the flexibility you may want to customize
 the three basic list environments (`enumerate`, `itemize` and
@@ -8,6 +8,8 @@ syntax.
 ### Latest changes
 
 ```
+3.11 2025-02-06
+     Revert a fix
 3.10 2025-01-19
    - A couple of fixes: \value* in ref=, a more robust resume*.
 3.9  2019-06-20
@@ -40,4 +42,4 @@ Repository:  https://github.com/jbezos/enumitem
 ________
 Javier Bezos --- http://www.texnia.com
 
-2025/01/19
+2025/02/06
